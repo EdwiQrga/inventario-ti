@@ -78,10 +78,14 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
         // Configuración (solo admin)
         // Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     });
-
+Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+Route::get('/reportes/export', [ReporteController::class, 'export'])->name('reportes.export');
     // --------------------------------------------------
     // USUARIO NORMAL
     // --------------------------------------------------
+Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
+
+
     Route::middleware('role:user')->group(function () {
         // Exportaciones de reportes (solo lectura, pero puede exportar)
         Route::prefix('reportes')->name('reportes.')->group(function () {
@@ -90,7 +94,7 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
             Route::get('/csv', [ReporteController::class, 'exportarCSV'])->name('csv');
         });
     });
-
+Route::resource('usuarios', UserController::class);
     // Configuración general (temporal - opcional)
     Route::view('/configuracion', 'configuracion')->name('configuracion');
 });

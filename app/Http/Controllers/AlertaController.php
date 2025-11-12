@@ -8,87 +8,42 @@ use Carbon\Carbon;
 
 class AlertaController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(Request $request)
     {
-        $query = Activo::query();
+        // ================================
+        // 🔔 ALERTAS DE LICENCIAS POR VENCER
+        // ================================
+        $alertasLicencias = Activo::whereNotNull('fecha_vencimiento')
+            ->where('fecha_vencimiento', '<=', now()->addDays(60)) // Próximos 60 días
+            ->with('user')
+            ->get();
 
-        // 🔍 FILTRO POR NOMBRE O SERIAL
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('serial', 'like', "%{$search}%");
-            });
-        }
-
-        // ⚠️ FILTRAR ALERTAS (licencias próximas a vencer o vencidas, y equipos en mantenimiento)
-        $query->where(function ($q) {
-            $q->where(function ($q2) {
-                $q2->whereNotNull('fecha_vencimiento')
-                    ->where('fecha_vencimiento', '<=', Carbon::now()->addMonth())
-                    ->orWhere('fecha_vencimiento', '<', Carbon::now());
-            })->orWhere('estado', 'Pending');
+        // Licencias que vencen en menos de 30 días (aún vigentes)
+        $licenciasProximas = $alertasLicencias->filter(function ($licencia) {
+            $dias = now()->diffInDays(Carbon::parse($licencia->fecha_vencimiento), false);
+            return $dias <= 30 && $dias >= 0;
         });
 
-        // 🧩 FILTRO POR TIPO DE ALERTA
-        if ($request->filled('tipo_alerta')) {
-            if ($request->input('tipo_alerta') === 'licencia') {
-                $query->whereNotNull('fecha_vencimiento')
-                      ->where('fecha_vencimiento', '<=', Carbon::now()->addMonth());
-            } elseif ($request->input('tipo_alerta') === 'mantenimiento') {
-                $query->where('estado', 'Pending');
-            }
-        }
+        // ================================
+        // 🛠️ ALERTAS DE MANTENIMIENTOS PROGRAMADOS
+        // ================================
+        $alertasMantenimiento = Activo::whereNotNull('fecha_mantenimiento')
+            ->where('fecha_mantenimiento', '>=', now()->subDays(30)) // últimos 30 días o próximos
+            ->get();
 
-        // 📅 FILTRO POR FECHA LÍMITE
-        if ($request->filled('fecha_hasta')) {
-            $query->whereDate('fecha_vencimiento', '<=', $request->input('fecha_hasta'));
-        }
-
-        // 🔁 ORDENAR (las más próximas primero)
-        $alertas = $query->orderBy('fecha_vencimiento', 'asc')->paginate(10);
-
-        // 🏷️ AGREGAR COLUMNA TIPO DE ALERTA
-        $alertas->getCollection()->transform(function ($alerta) {
-            $alerta->tipo_alerta = $alerta->fecha_vencimiento && (
-                $alerta->fecha_vencimiento < Carbon::now() || 
-                $alerta->fecha_vencimiento <= Carbon::now()->addMonth()
-            )
-                ? 'Licencia ' . ($alerta->fecha_vencimiento < Carbon::now() ? 'Vencida' : 'Próxima a Vencer')
-                : 'Mantenimiento';
-            return $alerta;
+        // Si tienes un campo `tipo_mantenimiento`, lo usamos para filtrar los programados
+        $mantenimientosProgramados = $alertasMantenimiento->filter(function ($activo) {
+            return strtolower($activo->tipo_mantenimiento) === 'programado';
         });
 
-        return view('alertas.index', compact('alertas'));
-    }
-
-    // ✅ Resolver una alerta
-    public function resolve($id)
-    {
-        $activo = Activo::findOrFail($id);
-        $activo->update(['estado' => 'Deployed']); 
-        return redirect()->route('alertas.index')->with('success', 'Alerta resuelta exitosamente.');
-    }
-
-    // ✅ Resolver todas las alertas
-    public function resolveAll(Request $request)
-    {
-        $activos = Activo::where(function ($q) {
-            $q->whereNotNull('fecha_vencimiento')
-              ->where('fecha_vencimiento', '<=', Carbon::now()->addMonth())
-              ->orWhere('fecha_vencimiento', '<', Carbon::now())
-              ->orWhere('estado', 'Pending');
-        })->get();
-
-        foreach ($activos as $activo) {
-            $activo->update(['estado' => 'Deployed']);
-        }
-
-        return redirect()->route('alertas.index')->with('success', 'Todas las alertas resueltas exitosamente.');
+        // ================================
+        // 📊 RETORNO A LA VISTA
+        // ================================
+        return view('alertas.index', compact(
+            'alertasLicencias',
+            'licenciasProximas',
+            'alertasMantenimiento',
+            'mantenimientosProgramados'
+        ));
     }
 }

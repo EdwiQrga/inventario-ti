@@ -14,13 +14,11 @@ return new class extends Migration
       Schema::create('activos', function (Blueprint $table) {
     $table->id();
     $table->string('nombre');
-    $table->string('codigo')->unique();
-    $table->foreignId('sucursal_id')->constrained();
-    $table->foreignId('tipo_activo_id')->constrained();
-    $table->foreignId('user_id')->nullable()->constrained();
-    $table->enum('estado', ['activo', 'en_reparacion', 'obsoleto'])->default('activo');
-    $table->date('fecha_adquisicion');
-    $table->date('fecha_vencimiento_garantia')->nullable();
+    $table->string('tipo');
+    $table->enum('estado', ['Activo', 'En Reparación', 'Retirado'])->default('Activo');
+    $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+    $table->date('fecha_compra');
+    $table->string('ubicacion')->nullable();
     $table->timestamps();
 });
     }
