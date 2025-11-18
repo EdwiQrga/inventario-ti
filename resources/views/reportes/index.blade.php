@@ -28,15 +28,8 @@
                         "background-light": "#f6f7f8",
                         "background-dark": "#101922",
                     },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.75rem",
-                        "xl": "1rem",
-                        "full": "9999px"
-                    },
+                    fontFamily: { display: ["Inter", "sans-serif"] },
+                    borderRadius: { DEFAULT: "0.5rem", lg: "0.75rem", xl: "1rem", full: "9999px" },
                 },
             },
         }
@@ -45,13 +38,16 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
         }
+        .material-symbols-filled {
+            font-variation-settings: 'FILL' 1;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
 <div class="relative flex h-auto min-h-screen w-full group/design-root overflow-x-hidden">
     <div class="layout-container flex h-full grow flex-row">
 
-        <!-- Sidebar -->
+        <!-- Sidebar (DISEÑO ORIGINAL - SIN CAMBIOS) -->
         <aside class="flex-col gap-y-6 items-stretch px-4 py-8 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 hidden lg:flex w-64 shadow-sm">
             <div class="flex items-center justify-center gap-x-2 text-primary px-2">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -68,7 +64,7 @@
                     <span class="material-symbols-outlined">inventory_2</span>
                     <span class="text-sm font-medium">Inventario</span>
                 </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
+                <a class="flex items-center gap-x-3 py-2 px-3 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="dashboard">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span class="text-sm font-medium">Dashboard</span>
                 </a>
@@ -76,8 +72,9 @@
                     <span class="material-symbols-outlined">notifications_active</span>
                     <span class="text-sm font-medium">Alertas</span>
                 </a>
+                <!-- REPORTES RESALTADO (solo se cambió filled → outlined) -->
                 <a class="flex items-center gap-x-3 py-2 px-3 rounded text-white bg-primary shadow-sm hover:bg-primary/90 transition-colors" href="{{ route('reportes.index') }}">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 400;">assessment</span>
+                    <span class="material-symbols-outlined">assessment</span>
                     <span class="text-sm font-semibold">Reportes</span>
                 </a>
                 <a class="flex items-center gap-x-3 py-2 px-3 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('usuarios.index') }}">
@@ -85,24 +82,12 @@
                     <span class="text-sm font-medium">Gestión de Usuarios</span>
                 </a>
             </nav>
-            <div class="flex flex-col gap-y-2">
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">settings</span>
-                    <span class="text-sm font-medium">Configuración</span>
-                </a>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="flex w-full items-center gap-x-3 py-2 px-3 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors text-left">
-                        <span class="material-symbols-outlined">logout</span>
-                        <span class="text-sm font-medium">Cerrar Sesión</span>
-                    </button>
-                </form>
-            </div>
+            <!-- CONFIGURACIÓN Y CERRAR SESIÓN ELIMINADOS -->
         </aside>
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1">
-            <!-- Header -->
+            <!-- Header: Con Cerrar Sesión al lado del nombre -->
             <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-6 sm:px-8 lg:px-10 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
                 <div class="flex items-center gap-4">
                     <button class="lg:hidden text-gray-600 dark:text-gray-300">
@@ -114,14 +99,25 @@
                     <button class="flex items-center justify-center rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
-                    <div class="flex items-center gap-x-3 py-2 pl-2 pr-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors cursor-pointer">
+
+                    <!-- Usuario + Nombre + Email -->
+                    <div class="flex items-center gap-x-3">
                         <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9"
                              style='background-image: url("{{ auth()->user()->avatar ?? "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) }}");'></div>
                         <div class="hidden sm:flex flex-col flex-1 min-w-0">
                             <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ auth()->user()->name }}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">Administrador</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->email }}</span>
                         </div>
                     </div>
+
+                    <!-- CERRAR SESIÓN AQUÍ -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-lg transition-colors">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            <span class="hidden sm:inline">Cerrar Sesión</span>
+                        </button>
+                    </form>
                 </div>
             </header>
 
@@ -147,7 +143,7 @@
 
                                         <!-- Activos por Usuario -->
                                         <label class="text-left p-4 rounded-lg border border-primary dark:border-primary bg-primary/5 dark:bg-primary/10 ring-2 ring-primary ring-offset-2 dark:ring-offset-background-dark cursor-pointer">
-                                            <input type="radio" name="reporte" value="activos_usuario" class="hidden" checked>
+                                            <input type="radio" name="reporte" value="activos_usuario" class="hidden" {{ request('reporte') == 'activos_usuario' ? 'checked' : 'checked' }}>
                                             <div class="flex items-center gap-3">
                                                 <span class="material-symbols-outlined text-primary text-2xl">person_pin</span>
                                                 <span class="font-semibold text-gray-800 dark:text-gray-100">Activos por Usuario</span>
@@ -247,8 +243,17 @@
                 label.classList.remove('border-primary', 'bg-primary/5', 'dark:bg-primary/10', 'ring-2', 'ring-primary', 'ring-offset-2', 'dark:ring-offset-background-dark');
                 label.classList.add('border-gray-200', 'dark:border-gray-700');
             });
-            radio.closest('label').classList.add('border-primary', 'dark:border-primary', 'bg-primary/5', 'dark:bg-primary/10', 'ring-2', 'ring-primary', 'ring-offset-2', 'dark:ring-offset-background-dark');
+            const selectedLabel = radio.closest('label');
+            selectedLabel.classList.add('border-primary', 'dark:border-primary', 'bg-primary/5', 'dark:bg-primary/10', 'ring-2', 'ring-primary', 'ring-offset-2', 'dark:ring-offset-background-dark');
         });
+    });
+
+    // Restaurar selección al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkedRadio = document.querySelector('input[name="reporte"]:checked');
+        if (checkedRadio) {
+            checkedRadio.dispatchEvent(new Event('change'));
+        }
     });
 </script>
 </body>

@@ -1,7 +1,6 @@
-<?php
+<?php 
 namespace App\Exports;
 
-use App\Models\User;
 use App\Models\Activo;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -9,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ActivosPorUsuarioExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class InventarioGeneralExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
     protected $usuarioId;
     protected $fechaInicio;
@@ -24,7 +23,7 @@ class ActivosPorUsuarioExport implements FromCollection, WithHeadings, WithMappi
 
     public function collection()
     {
-        $query = Activo::with('usuario', 'categoria')->whereNotNull('usuario_id');
+        $query = Activo::with('usuario', 'categoria');
 
         if ($this->usuarioId) {
             $query->where('usuario_id', $this->usuarioId);
@@ -37,39 +36,39 @@ class ActivosPorUsuarioExport implements FromCollection, WithHeadings, WithMappi
         return $query->get();
     }
 
-    public function getData()
-    {
-        $activos = $this->collection();
-        return $activos->groupBy('usuario.name');
-    }
-
     public function headings(): array
     {
         return [
-            'Usuario',
-            'Email',
-            'Activo',
+            'ID',
+            'Nombre',
             'Categoría',
             'Marca',
             'Modelo',
             'Número de Serie',
+            'Usuario Asignado',
             'Estado',
-            'Fecha de Asignación'
+            'Ubicación',
+            'Fecha de Adquisición',
+            'Valor',
+            'Garantía Hasta'
         ];
     }
 
     public function map($activo): array
     {
         return [
-            $activo->usuario->name ?? 'N/A',
-            $activo->usuario->email ?? 'N/A',
+            $activo->id,
             $activo->nombre,
             $activo->categoria->nombre ?? 'N/A',
             $activo->marca,
             $activo->modelo,
             $activo->numero_serie,
+            $activo->usuario->name ?? 'Sin asignar',
             $activo->estado,
-            $activo->fecha_asignacion ? $activo->fecha_asignacion->format('d/m/Y') : 'N/A'
+            $activo->ubicacion,
+            $activo->fecha_adquisicion ? $activo->fecha_adquisicion->format('d/m/Y') : 'N/A',
+            '$' . number_format($activo->valor, 2),
+            $activo->garantia_hasta ? $activo->garantia_hasta->format('d/m/Y') : 'N/A'
         ];
     }
 

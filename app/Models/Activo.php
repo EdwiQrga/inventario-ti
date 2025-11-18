@@ -5,14 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Activo extends Model
-{
-    // app/Models/Activo.php
+{ 
+// app/Models/Activo.php
 protected $fillable = [
-        'nombre', 'tipo', 'marca', 'modelo', 'sucursal', 'sucursal_area',
-        'razon_social', 'codigo_barras', 'serial', 'ssd', 'ram', 'procesador',
-        'descripcion', 'ubicacion', 'fecha_compra', 'fecha_vencimiento',
-        'estado', 'costo', 'user_id', 'asignado_a'
-    ];
+    'sucursal_area', 'razon_social', 'codigo_barras', 'marca', 'modelo',
+    'sd', 'ram', 'procesador', 'asignado', 'estado'
+];
     // ¡¡LARAVEL 12: Usa 'date' sin formato si es Y-m-d!!
     protected $casts = [
         'fecha_compra' => 'date',           // ← 2023-01-15 → Carbon

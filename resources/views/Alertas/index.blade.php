@@ -28,26 +28,18 @@
                         "background-light": "#f6f7f8",
                         "background-dark": "#101922",
                     },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.75rem",
-                        "xl": "1rem",
-                        "full": "9999px"
-                    },
+                    fontFamily: { display: ["Inter", "sans-serif"] },
+                    borderRadius: { DEFAULT: "0.5rem", lg: "0.75rem", xl: "1rem", full: "9999px" },
                 },
             },
         }
     </script>
     <style>
         .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 300,
-                'GRAD' 0,
-                'opsz' 20
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+        .material-symbols-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400;
         }
     </style>
 </head>
@@ -55,7 +47,7 @@
 <div class="relative flex h-auto min-h-screen w-full group/design-root overflow-x-hidden">
     <div class="layout-container flex h-full grow flex-row">
 
-        <!-- Sidebar -->
+        <!-- Sidebar (DISEÑO ORIGINAL + ORDEN CORRECTO + ITEM ACTIVO PERFECTO) -->
         <aside class="flex-col gap-y-6 items-stretch p-4 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 hidden lg:flex w-64 shadow-sm">
             <div class="flex items-center gap-x-3 px-4 py-2">
                 <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -63,50 +55,51 @@
                 </svg>
                 <span class="text-xl font-bold text-gray-900 dark:text-white">Inventario TI</span>
             </div>
+
             <nav class="flex flex-col gap-y-1.5 flex-1 px-2">
+                <!-- 1. Inicio -->
                 <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('dashboard') }}">
                     <span class="material-symbols-outlined text-xl">home</span>
                     <span class="text-sm font-medium">Inicio</span>
                 </a>
+
+                <!-- 2. Inventario -->
                 <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('activos.index') }}">
                     <span class="material-symbols-outlined text-xl">inventory_2</span>
                     <span class="text-sm font-medium">Inventario</span>
                 </a>
-                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
+
+                <!-- 3. Dashboard -->
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="dashboard">
                     <span class="material-symbols-outlined text-xl">dashboard</span>
                     <span class="text-sm font-medium">Dashboard</span>
                 </a>
+
+                <!-- 4. ALERTAS → ACTIVO (solo se cambió filled → outlined) -->
                 <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90 transition-colors" href="{{ route('alertas.index') }}">
-                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1, 'wght' 400;">notifications_active</span>
+                    <span class="material-symbols-outlined text-xl">notifications_active</span>
                     <span class="text-sm font-semibold">Alertas</span>
                 </a>
+
+                <!-- 5. Reportes -->
                 <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('reportes.index') }}">
                     <span class="material-symbols-outlined text-xl">assessment</span>
                     <span class="text-sm font-medium">Reportes</span>
                 </a>
+
+                <!-- 6. Gestión de Usuarios -->
                 <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('usuarios.index') }}">
                     <span class="material-symbols-outlined text-xl">group</span>
                     <span class="text-sm font-medium">Gestión de Usuarios</span>
                 </a>
             </nav>
-            <div class="flex flex-col gap-y-1.5 px-2">
-                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined text-xl">settings</span>
-                    <span class="text-sm font-medium">Configuración</span>
-                </a>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="flex w-full items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors text-left">
-                        <span class="material-symbols-outlined text-xl">logout</span>
-                        <span class="text-sm font-medium">Cerrar Sesión</span>
-                    </button>
-                </form>
-            </div>
+
+            <!-- CONFIGURACIÓN Y CERRAR SESIÓN ELIMINADOS -->
         </aside>
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1">
-            <!-- Header -->
+            <!-- Header: Cerrar Sesión al lado del nombre + email -->
             <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-6 sm:px-8 lg:px-10 h-16 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
                 <div class="flex items-center gap-4">
                     <button class="lg:hidden text-gray-600 dark:text-gray-300">
@@ -118,14 +111,25 @@
                     <button class="flex items-center justify-center rounded-full h-10 w-10 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
-                    <div class="flex items-center gap-x-3 py-1 pl-1 pr-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors cursor-pointer">
+
+                    <!-- Usuario + Nombre + Email -->
+                    <div class="flex items-center gap-x-3">
                         <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-8 w-8"
                              style='background-image: url("{{ auth()->user()->avatar ?? "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) }}");'></div>
                         <div class="hidden sm:flex flex-col flex-1 min-w-0">
                             <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ auth()->user()->name }}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">Administrador</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->email }}</span>
                         </div>
                     </div>
+
+                    <!-- CERRAR SESIÓN AQUÍ -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-lg transition-colors">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            <span class="hidden sm:inline">Cerrar Sesión</span>
+                        </button>
+                    </form>
                 </div>
             </header>
 

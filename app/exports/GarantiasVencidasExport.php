@@ -1,15 +1,16 @@
 <?php
+
 namespace App\Exports;
 
-use App\Models\User;
 use App\Models\Activo;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Carbon\Carbon;
 
-class ActivosPorUsuarioExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class GarantiasVencidasExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
     protected $usuarioId;
     protected $fechaInicio;
@@ -24,52 +25,50 @@ class ActivosPorUsuarioExport implements FromCollection, WithHeadings, WithMappi
 
     public function collection()
     {
-        $query = Activo::with('usuario', 'categoria')->whereNotNull('usuario_id');
+        $fechaLimite = Carbon::now()->addMonths(3);
+        
+        $query = Activo::with('usuario', 'categoria')
+            ->whereNotNull('garantia_hasta')
+            ->where('garantia_hasta', '<=', $fechaLimite);
 
         if ($this->usuarioId) {
             $query->where('usuario_id', $this->usuarioId);
         }
 
-        if ($this->fechaInicio && $this->fechaFin) {
-            $query->whereBetween('fecha_adquisicion', [$this->fechaInicio, $this->fechaFin]);
-        }
-
-        return $query->get();
-    }
-
-    public function getData()
-    {
-        $activos = $this->collection();
-        return $activos->groupBy('usuario.name');
+        return $query->orderBy('garantia_hasta', 'asc')->get();
     }
 
     public function headings(): array
     {
         return [
-            'Usuario',
-            'Email',
-            'Activo',
+            'ID',
+            'Nombre',
             'Categoría',
             'Marca',
             'Modelo',
-            'Número de Serie',
-            'Estado',
-            'Fecha de Asignación'
+            'Usuario Asignado',
+            'Garantía Hasta',
+            'Días Restantes',
+            'Estado de Garantía'
         ];
     }
 
     public function map($activo): array
     {
+        $garantiaHasta = Carbon::parse($activo->garantia_hasta);
+        $diasRestantes = Carbon::now()->diffInDays($garantiaHasta, false);
+        $estadoGarantia = $diasRestantes < 0 ? 'VENCIDA' : ($diasRestantes <= 30 ? 'POR VENCER' : 'VIGENTE');
+
         return [
-            $activo->usuario->name ?? 'N/A',
-            $activo->usuario->email ?? 'N/A',
+            $activo->id,
             $activo->nombre,
             $activo->categoria->nombre ?? 'N/A',
             $activo->marca,
             $activo->modelo,
-            $activo->numero_serie,
-            $activo->estado,
-            $activo->fecha_asignacion ? $activo->fecha_asignacion->format('d/m/Y') : 'N/A'
+            $activo->usuario->name ?? 'Sin asignar',
+            $garantiaHasta->format('d/m/Y'),
+            $diasRestantes,
+            $estadoGarantia
         ];
     }
 

@@ -7,7 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivoController;
 use App\Http\Controllers\AlertaController;
-use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\HomeController;
@@ -24,6 +24,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/', fn() => redirect()->route('login'));
 
+
 // --------------------------------------------------
 // RUTAS PROTEGIDAS (Auth + Prevent Back)
 // --------------------------------------------------
@@ -33,10 +34,12 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/inicio', [HomeController::class, 'index'])->name('home');
 
-    // RUTAS GENERALES (para TODOS los usuarios autenticados)
+    // Rutas generales accesibles para TODOS
     Route::get('/inventario', [ActivoController::class, 'index'])->name('inventario.index');
     Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
-    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index'); // PARA TODOS
+
+    // Página de reportes (acceso general)
+    Route::get('/reportes', [ReportesController::class, 'index'])->name('reportes.index');
 
     // --------------------------------------------------
     // ADMIN
@@ -54,56 +57,58 @@ Route::middleware(['auth', 'prevent.back'])->group(function () {
             Route::get('/{activo}', [ActivoController::class, 'show'])->name('show');
             Route::get('/export/excel', [ActivoController::class, 'exportExcel'])->name('export.excel');
             Route::get('/export/pdf', [ActivoController::class, 'exportPdf'])->name('export.pdf');
+
+            // Check-in / Check-out
             Route::post('/{activo}/checkin', [ActivoController::class, 'checkin'])->name('checkin');
             Route::post('/{activo}/checkout', [ActivoController::class, 'checkout'])->name('checkout');
         });
 
-        // Gestión de Alertas (solo admin puede resolver/crear)
+        // Gestión de Alertas (solo admin)
         Route::prefix('alertas')->name('alertas.')->group(function () {
             Route::patch('/resolve/{id}', [AlertaController::class, 'resolve'])->name('resolve');
             Route::patch('/resolve-all', [AlertaController::class, 'resolveAll'])->name('resolve.all');
             Route::post('/store', [AlertaController::class, 'store'])->name('store');
         });
 
-        // Exportaciones de reportes (solo admin)
+        // Exportación de reportes
         Route::prefix('reportes')->name('reportes.')->group(function () {
-            Route::get('/pdf', [ReporteController::class, 'exportarPDF'])->name('pdf');
-            Route::get('/excel', [ReporteController::class, 'exportarExcel'])->name('excel');
-            Route::get('/csv', [ReporteController::class, 'exportarCSV'])->name('csv');
+            Route::get('/pdf', [ReportesController::class, 'exportarPDF'])->name('pdf');
+            Route::get('/excel', [ReportesController::class, 'exportarExcel'])->name('excel');
+            Route::get('/csv', [ReportesController::class, 'exportarCSV'])->name('csv');
         });
 
         // Gestión de Usuarios
         Route::resource('usuarios', UserController::class);
 
-        // Configuración (solo admin)
-        // Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+        // Configuración
+       //Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     });
-Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-Route::get('/reportes/export', [ReporteController::class, 'export'])->name('reportes.export');
+
+Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
     // --------------------------------------------------
     // USUARIO NORMAL
     // --------------------------------------------------
-Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
-
-
     Route::middleware('role:user')->group(function () {
-        // Exportaciones de reportes (solo lectura, pero puede exportar)
+
+        // Reportes: solo lectura y exportación
         Route::prefix('reportes')->name('reportes.')->group(function () {
-            Route::get('/pdf', [ReporteController::class, 'exportarPDF'])->name('pdf');
-            Route::get('/excel', [ReporteController::class, 'exportarExcel'])->name('excel');
-            Route::get('/csv', [ReporteController::class, 'exportarCSV'])->name('csv');
+            Route::get('/pdf', [ReportesController::class, 'exportarPDF'])->name('pdf');
+            Route::get('/excel', [ReportesController::class, 'exportarExcel'])->name('excel');
+            Route::get('/csv', [ReportesController::class, 'exportarCSV'])->name('csv');
         });
     });
-   // routes/web.php
-Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-Route::get('/reportes/export', [ReporteController::class, 'export'])->name('reportes.export');
- 
 
-// routes/web.php
-Route::resource('alertas', AlertaController::class);
-    // routes/web.php
-Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
-Route::resource('usuarios', UserController::class);
-    // Configuración general (temporal - opcional)
-    Route::view('/configuracion', 'configuracion')->name('configuracion');
 });
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reportes', [ReportesController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes/export', [ReportesController::class, 'export'])->name('reportes.export');
+});
+Route::post('/activos', [ActivoController::class, 'store'])
+     ->name('activos.store')
+     ->middleware('web'); // o 'auth' si tienes autenticación
+
+     Route::get('/activos/{id}/editar', [ActivoController::class, 'edit'])->name('activos.editar');
+Route::put('/activos/{id}', [ActivoController::class, 'updateAjax'])->name('activos.update.ajax');
+
+Route::put('/activos/{id}', [ActivoController::class, 'update'])->name('activos.update');

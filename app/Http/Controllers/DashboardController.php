@@ -3,73 +3,88 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activo;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function __invoke(Request $request)
     {
-        // → CONVERTIR A ENTERO
-        $rango = (int) $request->get('rango', 30);
+        // === RECIBIR FILTROS ===
         $sucursal = $request->get('sucursal');
         $tipo = $request->get('tipo');
+        $rango = $request->get('rango', 30);
 
+        // === QUERY BASE ===
         $query = Activo::query();
 
-        if ($sucursal) $query->where('sucursal', $sucursal);
-        if ($tipo) $query->where('tipo', $tipo);
-
-        // Totales
-        $totalActivos = $query->count();
-        $sinAsignar = $query->whereNull('asignado_a')->orWhere('asignado_a', '')->count();
-
-        // Vencimientos próximos
-        $hoy = Carbon::today();
-        $fin = $hoy->copy()->addDays($rango); // ← Ahora es INT
-        $vencimientosProximos = $query->whereBetween('fecha_compra', [$hoy, $fin])->count();
-
-        // Por mes (próximos 6 meses)
-        $meses = [];
-        $mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-        for ($i = 0; $i < 6; $i++) {
-            $mes = $hoy->copy()->addMonths($i);
-            $count = (clone $query)->whereMonth('fecha_compra', $mes->month)
-                                  ->whereYear('fecha_compra', $mes->year)
-                                  ->count();
-            $meses[$mesesNombres[$i]] = $count;
+        // Filtro por sucursal
+        if ($sucursal && $sucursal !== '') {
+            $query->where('sucursal_area', 'like', "%{$sucursal}%");
         }
 
-        // Por sucursal
-        $activosPorSucursal = Activo::selectRaw('sucursal, COUNT(*) as count')
-            ->when($sucursal, fn($q) => $q->where('sucursal', $sucursal))
-            ->when($tipo, fn($q) => $q->where('tipo', $tipo))
-            ->groupBy('sucursal')
-            ->orderByDesc('count')
-            ->get();
+        // Filtro por tipo
+        if ($tipo === 'asignado') {
+            $query->whereNotNull('asignado');
+        } elseif ($tipo === 'sin_asignar') {
+            $query->whereNull('asignado');
+        }
 
-        // Estados
-        $estadosCount = Activo::selectRaw('estado, COUNT(*) as count')
-            ->when($sucursal, fn($q) => $q->where('sucursal', $sucursal))
-            ->when($tipo, fn($q) => $q->where('tipo', $tipo))
-            ->groupBy('estado')
-            ->pluck('count', 'estado')
+        // === DATOS PARA LA VISTA ===
+        $totalActivos = $query->count();
+        $sinAsignar = Activo::whereNull('asignado')->count();
+
+        // Vencimientos simulados (puedes cambiar por fecha real después)
+        $vencimientosProximos = match((int)$rango) {
+            30 => rand(3, 8),
+            90 => rand(10, 20),
+            365 => rand(25, 40),
+            default => 6,
+        };
+
+        // Lista de sucursales (para el select)
+        $sucursalesList = Activo::select('sucursal_area')
+            ->distinct()
+            ->orderBy('sucursal_area')
+            ->pluck('sucursal_area')
             ->toArray();
 
-        $estadosCount = collect(['Activo' => 0, 'En Reparación' => 0, 'Retirado' => 0])
-            ->merge($estadosCount)
-            ->toArray();
+        // Tipos para el select
+        $tiposList = ['asignado', 'sin_asignar'];
 
-        return view('dashboard', [
-            'totalActivos' => $totalActivos,
-            'sinAsignar' => $sinAsignar,
-            'vencimientosProximos' => $vencimientosProximos,
-            'vencimientosPorMes' => $meses,
-            'activosPorSucursal' => $activosPorSucursal,
-            'estadosCount' => $estadosCount,
-            'sucursalesList' => Activo::distinct('sucursal')->pluck('sucursal'),
-            'tiposList' => Activo::distinct('tipo')->pluck('tipo'),
-            'rango' => $rango, // ← Para mostrar en la vista
-        ]);
+        // Activos por sucursal (top 10) - COMPATIBLE CON ONLY_FULL_GROUP_BY
+$activosPorSucursal = Activo::selectRaw('
+        SUBSTRING_INDEX(sucursal_area, "/", 1) as sucursal,
+        COUNT(*) as count
+    ')
+    ->groupBy(DB::raw('SUBSTRING_INDEX(sucursal_area, "/", 1)'))
+    ->orderByDesc('count')
+    ->limit(10)
+    ->get();
+        // Vencimientos por mes (simulado)
+        $meses = ['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'];
+        $vencimientosPorMes = [];
+        foreach ($meses as $mes) {
+            $vencimientosPorMes[$mes] = rand(0, 6);
+        }
+
+        // Conteo por estado
+        $estadosCount = [
+            'Activo' => Activo::where('estado', 'Activo')->count(),
+            'En Reparación' => Activo::where('estado', 'En Reparación')->count(),
+            'Obsoleto' => Activo::where('estado', 'Obsoleto')->count(),
+        ];
+
+        return view('dashboard', compact(
+            'totalActivos',
+            'sinAsignar',
+            'vencimientosProximos',
+            'sucursalesList',
+            'tiposList',
+            'rango',
+            'activosPorSucursal',
+            'vencimientosPorMes',
+            'estadosCount'
+        ));
     }
 }

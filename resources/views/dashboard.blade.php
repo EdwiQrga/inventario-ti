@@ -1,3 +1,6 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
 <!DOCTYPE html>
 <html class="dark" lang="es">
 <head>
@@ -60,8 +63,9 @@
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span class="text-sm font-medium">Inventario</span>
             </a>
+            <!-- DASHBOARD RESALTADO (solo se cambió filled → outlined) -->
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
-                <span class="material-symbols-filled">dashboard</span>
+                <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm font-semibold">Dashboard</span>
             </a>
             <a href="{{ route('alertas.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
@@ -243,9 +247,12 @@
                                     @endphp
                                     <div class="flex items-center gap-2">
                                         <span class="w-16 text-gray-500 dark:text-gray-400">{{ $estado }}</span>
-                                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                            <div class="{{ $color }} rounded-full h-1.5 transition-all" style="width: {{ $porcentaje }}%"></div>
-                                        </div>
+                                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+    <div 
+        class="{{ $color }} h-full rounded-full transition-all duration-500 ease-out" 
+        style="width: {{ $porcentaje }}%"
+    ></div>
+</div>
                                         <span class="w-8 text-right font-medium">{{ $count }}</span>
                                     </div>
                                 @endforeach
