@@ -94,6 +94,15 @@ Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index'
             Route::get('/csv', [ReporteController::class, 'exportarCSV'])->name('csv');
         });
     });
+   // routes/web.php
+Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+Route::get('/reportes/export', [ReporteController::class, 'export'])->name('reportes.export');
+ 
+
+// routes/web.php
+Route::resource('alertas', AlertaController::class);
+    // routes/web.php
+Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
 Route::resource('usuarios', UserController::class);
     // Configuración general (temporal - opcional)
     Route::view('/configuracion', 'configuracion')->name('configuracion');

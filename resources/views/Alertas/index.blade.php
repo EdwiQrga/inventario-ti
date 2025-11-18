@@ -1,303 +1,261 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html class="dark" lang="es">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Panel de Alertas de Inventario de TI</title>
+    <title>Alertas Preventivas - Inventario TI</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
-    <style type="text/tailwindcss">
-        @layer base {
-            :root {
-                --background: 0 0% 100%;
-                --foreground: 224 71.4% 4.1%;
-                --card: 0 0% 100%;
-                --card-foreground: 224 71.4% 4.1%;
-                --primary: 220 9.1% 94.9%;
-                --primary-foreground: 220 13.1% 33.1%;
-                --secondary: 220 14.3% 95.9%;
-                --secondary-foreground: 220 9% 39.8%;
-                --muted: 220 14.3% 95.9%;
-                --muted-foreground: 225.9 10% 46.5%;
-                --accent: 220 14.3% 95.9%;
-                --accent-foreground: 220 9% 39.8%;
-                --destructive: 0 84.2% 60.2%;
-                --destructive-foreground: 0 0% 98%;
-                --border: 220 13% 91%;
-                --input: 220 13% 91%;
-                --ring: 224 71.4% 4.1%;
-                --radius: 0.5rem;
-            }
-            .dark {
-                --background: 224 71.4% 4.1%;
-                --foreground: 0 0% 98%;
-                --card: 224 71.4% 4.1%;
-                --card-foreground: 0 0% 98%;
-                --primary: 215 27.9% 16.9%;
-                --primary-foreground: 0 0% 98%;
-                --secondary: 215 27.9% 16.9%;
-                --secondary-foreground: 0 0% 98%;
-                --muted: 215 27.9% 16.9%;
-                --muted-foreground: 217.9 10.6% 64.9%;
-                --accent: 215 27.9% 16.9%;
-                --accent-foreground: 0 0% 98%;
-                --destructive: 0 62.8% 30.6%;
-                --destructive-foreground: 0 0% 98%;
-                --border: 215 27.9% 16.9%;
-                --input: 215 27.9% 16.9%;
-                --ring: 216 12.2% 83.9%;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
+                    boxShadow: {
+                        'DEFAULT': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                    },
                     colors: {
-                        border: "hsl(var(--border))",
-                        input: "hsl(var(--input))",
-                        ring: "hsl(var(--ring))",
-                        background: "hsl(var(--background))",
-                        foreground: "hsl(var(--foreground))",
-                        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-                        secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
-                        destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
-                        muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
-                        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
-                        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
-                        card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+                        "primary": "#005850",
+                        "secondary": "#62c443",
+                        "accent-1": "#00868a",
+                        "accent-2": "#7ac5c7",
+                        "accent-3": "#05553c",
+                        "accent-4": "#01a48b",
+                        "accent-5": "#007a63",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
                     },
                     fontFamily: {
-                        "display": ["Lato", "sans-serif"],
-                        "body": ["Roboto", "sans-serif"]
+                        "display": ["Inter", "sans-serif"]
                     },
                     borderRadius: {
-                        lg: "var(--radius)",
-                        md: "calc(var(--radius) - 2px)",
-                        sm: "calc(var(--radius) - 4px)",
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
                     },
                 },
             },
         }
     </script>
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 300,
+                'GRAD' 0,
+                'opsz' 20
+        }
     </style>
 </head>
-<body class="bg-background font-body text-foreground dark">
-<div class="relative flex h-auto min-h-screen w-full flex-col">
-    <div class="flex h-full grow flex-row">
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="relative flex h-auto min-h-screen w-full group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-row">
 
         <!-- Sidebar -->
-        <aside class="flex flex-col w-64 bg-card p-4 border-r border-border">
-            <div class="flex flex-col gap-4 mb-8">
-                <div class="flex gap-3 items-center">
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                         style='background-image: url("{{ auth()->user()->avatar ?? "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) }}");'></div>
-                    <div class="flex flex-col">
-                        <h1 class="text-foreground text-base font-bold font-display">{{ auth()->user()->name }}</h1>
-                        <p class="text-muted-foreground text-sm">Departamento de TI</p>
-                    </div>
-                </div>
+        <aside class="flex-col gap-y-6 items-stretch p-4 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 hidden lg:flex w-64 shadow-sm">
+            <div class="flex items-center gap-x-3 px-4 py-2">
+                <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+                </svg>
+                <span class="text-xl font-bold text-gray-900 dark:text-white">Inventario TI</span>
             </div>
-
-            <nav class="flex-1 px-4 py-4">
-                <ul class="flex flex-col gap-2">
-                    <li><a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-muted-foreground hover:bg-muted">
-                        <span class="material-symbols-outlined">home</span>
-                        <span class="text-sm font-medium">Inicio</span>
-                    </a></li>
-                    <li><a href="{{ route('activos.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-primary bg-primary/10 dark:bg-primary dark:text-white">
-                        <span class="material-symbols-outlined">inventory</span>
-                        <span class="text-sm font-medium">Inventario</span>
-                    </a></li>
-                    <li><a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-muted-foreground hover:bg-muted">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        <span class="text-sm font-medium">Dashboard</span>
-                    </a></li>
-                    <li><a href="{{ route('alertas.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-primary bg-primary/10 dark:bg-primary dark:text-white">
-                        <span class="material-symbols-outlined">notifications</span>
-                        <span class="text-sm font-medium">Alertas</span>
-                    </a></li>
-                    <li><a href="{{ route('reportes.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-muted-foreground hover:bg-muted">
-                        <span class="material-symbols-outlined">analytics</span>
-                        <span class="text-sm font-medium">Reportes</span>
-                    </a></li>
-                    <li><a href="{{ route('usuarios.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-2 text-muted-foreground hover:bg-muted">
-                        <span class="material-symbols-outlined">group</span>
-                        <span class="text-sm font-medium">Gestión de Usuarios</span>
-                    </a></li>
-                </ul>
-            </nav>
-
-            <div class="flex flex-col gap-1 mt-auto">
-                <a href="#" class="flex items-center gap-3 px-3 py-2 text-foreground/80 hover:bg-muted rounded-lg">
-                    <span class="material-symbols-outlined">settings</span>
-                    <p class="text-sm font-medium">Configuración</p>
+            <nav class="flex flex-col gap-y-1.5 flex-1 px-2">
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('dashboard') }}">
+                    <span class="material-symbols-outlined text-xl">home</span>
+                    <span class="text-sm font-medium">Inicio</span>
                 </a>
-                <form method="POST" action="{{ route('logout') }}">
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('activos.index') }}">
+                    <span class="material-symbols-outlined text-xl">inventory_2</span>
+                    <span class="text-sm font-medium">Inventario</span>
+                </a>
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
+                    <span class="material-symbols-outlined text-xl">dashboard</span>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90 transition-colors" href="{{ route('alertas.index') }}">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1, 'wght' 400;">notifications_active</span>
+                    <span class="text-sm font-semibold">Alertas</span>
+                </a>
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('reportes.index') }}">
+                    <span class="material-symbols-outlined text-xl">assessment</span>
+                    <span class="text-sm font-medium">Reportes</span>
+                </a>
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('usuarios.index') }}">
+                    <span class="material-symbols-outlined text-xl">group</span>
+                    <span class="text-sm font-medium">Gestión de Usuarios</span>
+                </a>
+            </nav>
+            <div class="flex flex-col gap-y-1.5 px-2">
+                <a class="flex items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
+                    <span class="material-symbols-outlined text-xl">settings</span>
+                    <span class="text-sm font-medium">Configuración</span>
+                </a>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
-                    <button type="submit" class="flex w-full items-center gap-3 px-3 py-2 text-foreground/80 hover:bg-muted rounded-lg text-left">
-                        <span class="material-symbols-outlined">logout</span>
-                        <p class="text-sm font-medium">Cerrar sesión</p>
+                    <button type="submit" class="flex w-full items-center gap-x-3 py-2.5 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors text-left">
+                        <span class="material-symbols-outlined text-xl">logout</span>
+                        <span class="text-sm font-medium">Cerrar Sesión</span>
                     </button>
                 </form>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 bg-background">
-            <div class="flex flex-wrap justify-between gap-3 mb-6">
-                <p class="text-foreground text-4xl font-black tracking-tight font-display">Panel de Alertas</p>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="flex flex-wrap gap-4 mb-6">
-                <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-card border border-border">
-                    <p class="text-muted-foreground text-base font-medium">Alertas Activas</p>
-                    <p class="text-foreground text-2xl font-bold">{{ $alertasLicencias->count() + $alertasMantenimiento->count() }}</p>
+        <div class="flex flex-col flex-1">
+            <!-- Header -->
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-6 sm:px-8 lg:px-10 h-16 bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button class="lg:hidden text-gray-600 dark:text-gray-300">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <h1 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">Alertas Preventivas</h1>
                 </div>
-                <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-card border border-border">
-                    <p class="text-muted-foreground text-base font-medium">Licencias por Vencer</p>
-                    <p class="text-foreground text-2xl font-bold">{{ $licenciasProximas->count() }}</p>
-                </div>
-                <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-card border border-border">
-                    <p class="text-muted-foreground text-base font-medium">Equipos en Mantenimiento</p>
-                    <p class="text-foreground text-2xl font-bold">{{ $mantenimientosProgramados->count() }}</p>
-                </div>
-            </div>
-
-            <!-- Filtros y Búsqueda -->
-            <div class="flex items-center justify-between gap-4 mb-4">
-                <form method="GET" action="{{ route('alertas.index') }}" class="flex-1">
-                    <label class="flex flex-col min-w-40 h-12 w-full max-w-md">
-                        <div class="flex w-full items-stretch rounded-lg h-full">
-                            <div class="text-muted-foreground flex border border-border bg-card items-center justify-center pl-4 rounded-l-lg border-r-0">
-                                <span class="material-symbols-outlined">search</span>
-                            </div>
-                            <input name="search" value="{{ request('search') }}"
-                                   class="form-input flex w-full resize-none overflow-hidden rounded-lg text-foreground focus:outline-0 focus:ring-0 border border-border bg-card h-full placeholder:text-muted-foreground px-4 rounded-l-none border-l-0 pl-2 text-base"
-                                   placeholder="Buscar por software o equipo"/>
+                <div class="flex flex-1 justify-end gap-2 items-center">
+                    <button class="flex items-center justify-center rounded-full h-10 w-10 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <div class="flex items-center gap-x-3 py-1 pl-1 pr-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors cursor-pointer">
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-8 w-8"
+                             style='background-image: url("{{ auth()->user()->avatar ?? "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) }}");'></div>
+                        <div class="hidden sm:flex flex-col flex-1 min-w-0">
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ auth()->user()->name }}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">Administrador</span>
                         </div>
-                    </label>
-                </form>
-                <div class="flex gap-3">
-                    <button type="button" onclick="toggleFilter('estado')" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-secondary px-4 border border-border">
-                        <p class="text-secondary-foreground text-sm font-medium">Estado</p>
-                        <span class="material-symbols-outlined text-secondary-foreground">expand_more</span>
-                    </button>
-                    <button type="button" onclick="toggleFilter('fecha')" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-secondary px-4 border border-border">
-                        <p class="text-secondary-foreground text-sm font-medium">Fecha</p>
-                        <span class="material-symbols-outlined text-secondary-foreground">expand_more</span>
-                    </button>
+                    </div>
                 </div>
-            </div>
+            </header>
 
-            <!-- Alertas de Licencia -->
-            <div class="bg-card rounded-xl shadow-md overflow-hidden border border-border mb-8">
-                <h3 class="text-lg font-bold text-foreground p-4 font-display">Alertas de Licencia</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-muted-foreground">
-                        <thead class="text-xs text-foreground/80 uppercase bg-muted">
-                            <tr>
-                                <th class="px-6 py-3">Nombre del Software</th>
-                                <th class="px-6 py-3">Fecha de Vencimiento</th>
-                                <th class="px-6 py-3">Días Restantes</th>
-                                <th class="px-6 py-3">Usuario Asignado</th>
-                                <th class="px-6 py-3">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($alertasLicencias as $licencia)
-                            @php
-                                $dias = now()->diffInDays(\Carbon\Carbon::parse($licencia->fecha_vencimiento), false);
-                                $color = $dias < 0 ? 'bg-red-500/10 text-red-500' : ($dias <= 30 ? 'bg-orange-500/10 text-orange-500' : '');
-                                $texto = $dias < 0 ? 'Vencido' : $dias;
-                            @endphp
-                            <tr class="bg-card border-b border-border">
-                                <th class="px-6 py-4 font-medium text-foreground">{{ $licencia->nombre }}</th>
-                                <td class="px-6 py-4">
-                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded {{ $color }}">
-                                        {{ \Carbon\Carbon::parse($licencia->fecha_vencimiento)->format('d/m/Y') }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="font-bold {{ $dias < 0 ? 'text-red-500' : ($dias <= 30 ? 'text-orange-500' : '') }}">
-                                        {{ $texto }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">{{ $licencia->user?->name ?? 'Sin asignar' }}</td>
-                                <td class="px-6 py-4">
-                                    <button class="bg-primary hover:bg-primary/80 text-primary-foreground text-xs font-bold py-1 px-3 rounded-lg">
-                                        Renovar Licencia
-                                    </button>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-8 text-muted-foreground">No hay licencias por vencer.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- Main -->
+            <main class="flex-1 px-6 sm:px-8 lg:px-10 py-8">
+                <div class="max-w-7xl mx-auto">
 
-            <!-- Alertas de Mantenimiento -->
-            <div class="bg-card rounded-xl shadow-md overflow-hidden border border-border">
-                <h3 class="text-lg font-bold text-foreground p-4 font-display">Alertas de Mantenimiento</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-muted-foreground">
-                        <thead class="text-xs text-foreground/80 uppercase bg-muted">
-                            <tr>
-                                <th class="px-6 py-3">Nombre del Equipo</th>
-                                <th class="px-6 py-3">Tipo de Mantenimiento</th>
-                                <th class="px-6 py-3">Fecha Programada</th>
-                                <th class="px-6 py-3">Estado</th>
-                                <th class="px-6 py-3">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($alertasMantenimiento as $mantenimiento)
-                            <tr class="bg-card border-b border-border">
-                                <th class="px-6 py-4 font-medium text-foreground">{{ $mantenimiento->nombre }}</th>
-                                <td class="px-6 py-4">{{ $mantenimiento->tipo_mantenimiento }}</td>
-                                <td class="px-6 py-4">{{ \Carbon\Carbon::parse($mantenimiento->fecha_programada)->format('d/m/Y') }}</td>
-                                <td class="px-6 py-4">
-                                    <span class="text-xs font-medium px-2.5 py-0.5 rounded
-                                        {{ $mantenimiento->estado == 'Completado' ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
-                                        {{ $mantenimiento->estado }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 flex gap-2">
-                                    @if($mantenimiento->estado == 'Programado')
-                                        <button class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-3 rounded-lg">Completado</button>
-                                        <button class="bg-primary hover:bg-primary/80 text-primary-foreground text-xs font-bold py-1 px-3 rounded-lg">Reprogramar</button>
-                                    @else
-                                        <button class="bg-muted text-muted-foreground text-xs font-bold py-1 px-3 rounded-lg cursor-not-allowed">Ver Detalles</button>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-8 text-muted-foreground">No hay mantenimientos programados.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <!-- Estadísticas -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Alertas Críticas</p>
+                            <p class="text-red-500 text-3xl font-bold tracking-tight">
+                                {{ $alertas->where('prioridad', 'Crítica')->count() }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Alertas Moderadas</p>
+                            <p class="text-yellow-500 text-3xl font-bold tracking-tight">
+                                {{ $alertas->where('prioridad', 'Moderada')->count() }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm font-medium">Alertas de Información</p>
+                            <p class="text-blue-500 text-3xl font-bold tracking-tight">
+                                {{ $alertas->where('prioridad', 'Información')->count() }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Búsqueda + Botón -->
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-full max-w-sm">
+                                <form method="GET" action="{{ route('alertas.index') }}">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+                                    <input name="search" value="{{ request('search') }}"
+                                           class="w-full h-10 pl-10 pr-4 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors text-sm"
+                                           placeholder="Buscar alertas..." type="search"/>
+                                </form>
+                            </div>
+                            <button type="button" class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm">
+                                <span>Filtrar</span>
+                                <span class="material-symbols-outlined text-lg">filter_list</span>
+                            </button>
+                        </div>
+                        <a href="{{ route('alertas.create') }}"
+                           class="flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            <span class="truncate">Configurar Nueva Alerta</span>
+                        </a>
+                    </div>
+
+                    <!-- Tabla de Alertas -->
+                    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-800">
+                                    <tr>
+                                        <th class="px-6 py-3" scope="col">Prioridad</th>
+                                        <th class="px-6 py-3" scope="col">Descripción</th>
+                                        <th class="px-6 py-3" scope="col">Activo Involucrado</th>
+                                        <th class="px-6 py-3" scope="col">Fecha</th>
+                                        <th class="px-6 py-3" scope="col">Estado</th>
+                                        <th class="px-6 py-3 text-right" scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($alertas as $alerta)
+                                        @php
+                                            $prioridadColor = $alerta->prioridad == 'Crítica' ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' :
+                                                             ($alerta->prioridad == 'Moderada' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400' :
+                                                             'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400');
+
+                                            $estadoColor = $alerta->estado == 'Nueva' ? 'bg-red-500' :
+                                                          ($alerta->estado == 'En Proceso' ? 'bg-green-500' : 'bg-gray-500');
+                                        @endphp
+                                        <tr class="border-b dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium {{ $prioridadColor }}">
+                                                    {{ $alerta->prioridad }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                                {{ $alerta->descripcion }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ $alerta->activo?->nombre ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                {{ \Carbon\Carbon::parse($alerta->fecha)->format('d/m/Y') }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex items-center gap-x-2">
+                                                    <div class="h-2 w-2 rounded-full {{ $estadoColor }}"></div>
+                                                    {{ $alerta->estado }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-right">
+                                                @if($alerta->estado == 'Resuelta')
+                                                    <a href="{{ route('alertas.show', $alerta) }}" class="font-medium text-primary dark:text-accent-2 hover:underline">Ver detalles</a>
+                                                @else
+                                                    <a href="{{ route('alertas.edit', $alerta) }}" class="font-medium text-primary dark:text-accent-2 hover:underline">Gestionar</a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                                No hay alertas activas.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        <nav aria-label="Table navigation" class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-800">
+                            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                Mostrando <span class="font-semibold text-gray-900 dark:text-white">{{ $alertas->firstItem() }}-{{ $alertas->lastItem() }}</span> de <span class="font-semibold text-gray-900 dark:text-white">{{ $alertas->total() }}</span>
+                            </span>
+                            <div>
+                                {{ $alertas->appends(request()->query())->links('pagination::tailwind') }}
+                            </div>
+                        </nav>
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 </div>
-
-<script>
-    function toggleFilter(type) {
-        // Placeholder para filtros dinámicos (Livewire o JS)
-        alert('Filtro por ' + type + ' (próximamente)');
-    }
-</script>
 </body>
 </html>

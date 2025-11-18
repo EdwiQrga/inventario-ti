@@ -11,13 +11,8 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'rol',
-        'estado',
-    ];
-
+    'name', 'email', 'password', 'role', 'status', 'avatar', 'notas'
+];
     /**
      * Encripta la contraseña automáticamente si no está en hash
      */

@@ -2,48 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activo;
+use App\Models\Licencia;
+use App\Models\Mantenimiento;
+use App\Models\Alerta;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class AlertaController extends Controller
 {
     public function index(Request $request)
     {
-        // ================================
-        // 🔔 ALERTAS DE LICENCIAS POR VENCER
-        // ================================
-        $alertasLicencias = Activo::whereNotNull('fecha_vencimiento')
-            ->where('fecha_vencimiento', '<=', now()->addDays(60)) // Próximos 60 días
-            ->with('user')
+        // === LICENCIAS POR VENCER (próximos 60 días) ===
+        $licenciasPorVencer = Licencia::whereNotNull('fecha_vencimiento')
+            ->whereBetween('fecha_vencimiento', [now(), now()->addDays(60)])
+            ->with('activo') // Relación con el modelo Activo
+            ->orderBy('fecha_vencimiento')
             ->get();
 
-        // Licencias que vencen en menos de 30 días (aún vigentes)
-        $licenciasProximas = $alertasLicencias->filter(function ($licencia) {
-            $dias = now()->diffInDays(Carbon::parse($licencia->fecha_vencimiento), false);
-            return $dias <= 30 && $dias >= 0;
-        });
-
-        // ================================
-        // 🛠️ ALERTAS DE MANTENIMIENTOS PROGRAMADOS
-        // ================================
-        $alertasMantenimiento = Activo::whereNotNull('fecha_mantenimiento')
-            ->where('fecha_mantenimiento', '>=', now()->subDays(30)) // últimos 30 días o próximos
+        // === MANTENIMIENTOS PRÓXIMOS (en los siguientes 30 días) ===
+        $mantenimientosProximos = Mantenimiento::whereNotNull('proxima_fecha')
+            ->whereBetween('proxima_fecha', [now(), now()->addDays(30)])
+            ->with('activo') // Relación con el modelo Activo
+            ->orderBy('proxima_fecha')
             ->get();
 
-        // Si tienes un campo `tipo_mantenimiento`, lo usamos para filtrar los programados
-        $mantenimientosProgramados = $alertasMantenimiento->filter(function ($activo) {
-            return strtolower($activo->tipo_mantenimiento) === 'programado';
-        });
+        // === ALERTAS (con búsqueda por descripción, prioridad o activo relacionado) ===
+        $query = Alerta::with('activo');
 
-        // ================================
-        // 📊 RETORNO A LA VISTA
-        // ================================
-        return view('alertas.index', compact(
-            'alertasLicencias',
-            'licenciasProximas',
-            'alertasMantenimiento',
-            'mantenimientosProgramados'
-        ));
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('descripcion', 'like', "%{$search}%")
+                  ->orWhere('prioridad', 'like', "%{$search}%")
+                  ->orWhereHas('activo', function ($q) use ($search) {
+                      $q->where('nombre', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Paginación de alertas
+        $alertas = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // === DEVOLVER TODO A LA VISTA ===
+        return view('alertas.index', compact('licenciasPorVencer', 'mantenimientosProximos', 'alertas'));
     }
 }
