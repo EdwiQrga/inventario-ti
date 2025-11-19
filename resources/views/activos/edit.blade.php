@@ -14,234 +14,248 @@
             darkMode: "class",
             theme: {
                 extend: {
-                    boxShadow: { 'DEFAULT': '0 1px 2px 0 rgb(0 0 0 / 0.05)', 'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)', 'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)', },
                     colors: {
                         "primary": "#005850",
                         "secondary": "#62c443",
                         "accent-1": "#00868a",
-                        "accent-2": "#7ac5c7",
-                        "accent-3": "#05553c",
-                        "accent-4": "#01a48b",
-                        "accent-5": "#007a63",
                         "background-light": "#f6f7f8",
                         "background-dark": "#101922",
                     },
                     fontFamily: { display: ["Inter", "sans-serif"] },
-                    borderRadius: { DEFAULT: "0.5rem", lg: "0.75rem", xl: "1rem", full: "9999px" },
                 },
             },
         }
     </script>
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20; }
+        .material-symbols-filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 min-h-screen">
 
-<div class="relative flex h-auto min-h-screen w-full group/design-root overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-row">
+<div class="flex flex-col lg:flex-row min-h-screen">
 
-        <!-- TU SIDEBAR EXACTO -->
-        <aside class="flex-col gap-y-6 items-stretch px-4 py-8 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 hidden lg:flex w-64 shadow-sm">
-            <div class="flex items-center justify-center gap-x-2 text-primary px-2">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="lg:w-64 w-full lg:block fixed lg:static inset-0 z-40 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-sm">
+        <div class="flex items-center justify-between lg:justify-start gap-4 px-6 h-16 border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-2">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.4009L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.4009L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
                 </svg>
-                <span class="text-xl font-bold">Inventario TI</span>
+                <span class="text-xl font-bold text-primary">Inventario TI</span>
             </div>
-            <nav class="flex flex-col gap-y-2 flex-1">
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-white dark:text-white bg-primary dark:bg-primary transition-colors" href="#">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 400;">inventory_2</span>
-                    <span class="text-sm font-semibold">Inventario</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">assessment</span>
-                    <span class="text-sm font-medium">Reportes</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">group</span>
-                    <span class="text-sm font-medium">Usuarios</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">category</span>
-                    <span class="text-sm font-medium">Categorías</span>
-                </a>
-            </nav>
-            <div class="flex flex-col gap-y-2">
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">settings</span>
-                    <span class="text-sm font-medium">Configuración</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="#">
-                    <span class="material-symbols-outlined">logout</span>
-                    <span class="text-sm font-medium">Cerrar Sesión</span>
-                </a>
-            </div>
-        </aside>
+            <button id="closeSidebar" class="lg:hidden">
+               
 
-        <div class="flex flex-col flex-1">
-            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-6 sm:px-8 lg:px-10 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <button class="lg:hidden text-gray-600 dark:text-gray-300">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                    <h1 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">Editar Activo</h1>
-                </div>
-                <div class="flex flex-1 justify-end gap-2 items-center">
-                    <button class="flex items-center justify-center rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-                    <div class="flex items-center gap-x-3 py-2 pl-2 pr-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors cursor-pointer">
-                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6DVvTRMI01mdiaqYjF9V4oxM0z9WULXszsPaaaaYoXXtrngbFF7MOPwD6OdpxAWGvzkXerhpPY9mAmC9vSKMLV8hKsZp2T5otC-Ea8y_XyDIj1nCBLHEcvtPsesGiDZ3niNWLv3-4DSHIlYP5SfjyDHqvPSfV8TQTmD419Cd0qB5pQC834L0HIHU6O11pxOiXoZeAF3b4GKBbpULfwHmYlC5ZN6a-EVUWpeAEpvLX64RIJsGfZikhuJgDmdvV6z22imA37kvlOfY");'></div>
-                        <div class="hidden sm:flex flex-col flex-1 min-w-0">
-                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">Ana García</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 truncate">Administrador</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-1 px-6 sm:px-8 lg:px-10 py-8 bg-background-light dark:bg-background-dark">
-                <div class="max-w-7xl mx-auto flex flex-col gap-8">
-
-                   <form id="editForm" action="{{ route('activos.update', $activo->id) }}" method="POST">
-    @csrf
-    <input type="hidden" name="_method" value="PUT">
-
-    <!-- TODO TU CONTENIDO DEL FORMULARIO EXACTO (sin cambiar nada más) -->
-    <div class="lg:col-span-2 flex flex-col gap-8">
-        <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div class="pb-4 border-b border-gray-200 dark:border-gray-800">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Información del Activo</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Detalles generales, especificaciones y estado actual del activo.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">ID</label>
-                    <input type="text" readonly value="{{ $activo->id }}" class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Sucursal/Área</label>
-                    <input name="sucursal_area" value="{{ $activo->sucursal_area }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50">
-                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Razón Social</label>
-                    <input name="razon_social" value="{{ $activo->razon_social }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50">
-                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Código de Barras</label>
-                    <input name="codigo_barras" value="{{ $activo->codigo_barras }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50">
-                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
-                </div>
-
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Marca</label><input name="marca" value="{{ $activo->marca }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Modelo</label><input name="modelo" value="{{ $activo->modelo }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">SD</label><input name="sd" value="{{ $activo->sd }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">RAM</label><input name="ram" value="{{ $activo->ram }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-                <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Procesador</label><input name="procesador" value="{{ $activo->procesador }}" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Asignado</label><input name="asignado" value="{{ $activo->asignado_a ?? '' }}" class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Estado</label>
-                    <select name="estado" required class="w-full h-10 px-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent-1/50">
-                        <option value="Activo" {{ $activo->estado == 'Activo' ? 'selected' : '' }}>Activo</option>
-                        <option value="En reparación" {{ $activo->estado == 'En reparación' ? 'selected' : '' }}>En reparación</option>
-                        <option value="Obsoleto" {{ $activo->estado == 'Obsoleto' ? 'selected' : '' }}>Obsoleto</option>
-                        <option value="En Almacén" {{ $activo->estado == 'En Almacén' ? 'selected' : '' }}>En Almacén</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div class="pb-4 border-b border-gray-200 dark:border-gray-800">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Notas Adicionales</h2>
-            </div>
-            <textarea name="notas" class="w-full p-3 text-sm rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-300 dark:border-gray-700 min-h-[160px]">{{ $activo->notas ?? '' }}</textarea>
-        </div>
-    </div>
-
-    <div class="lg:col-span-1 flex flex-col justify-end">
-        <div class="sticky bottom-0 lg:static bg-background-light dark:bg-background-dark py-4 lg:py-0 flex justify-end items-center gap-3 lg:mt-auto">
-            <a href="{{ url()->previous() }}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-white dark:bg-gray-700/80 border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm">
-                <span class="truncate">Cancelar</span>
-            </a>
-            <button type="submit" id="btnGuardar" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                <span class="material-symbols-outlined text-lg">save</span>
-                <span class="truncate">Guardar Cambios</span>
+ <span class="material-symbols-outlined">close</span>
             </button>
         </div>
+        <nav class="p-4 space-y-2">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+            <a href="{{ route('activos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
+                <span class="material-symbols-outlined material-symbols-filled">inventory_2</span> Inventario
+            </a>
+        </nav>
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header con flecha atrás -->
+        <header class="flex items-center justify-between px-4 lg:px-8 py-4 h-16 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <button id="openSidebar" class="lg:hidden">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('activos.index') }}" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60 transition">
+                        <span class="material-symbols-outlined text-2xl">arrow_back</span>
+                    </a>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Editar Activo #{{ $activo->id }}</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="bg-cover bg-center rounded-full size-10" 
+                         style='background-image: url("{{ auth()->user()->avatar ?? "https://ui-avatars.com/api/?name=" . urlencode(auth()->user()->name) . "&background=005850&color=fff" }}");'>
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <p class="font-semibold">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ auth()->user()->email }}</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 rounded-lg transition">
+                        <span class="material-symbols-outlined">logout</span>
+                        <span class="hidden sm:inline">Cerrar Sesión</span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="flex-1 p-6 lg:p-10">
+            <div class="max-w-7xl mx-auto">
+
+                <form id="editForm" action="{{ route('activos.update', $activo->id) }}" method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    @csrf
+                    <input type="hidden" name="_method" value="PUT">
+
+                    <!-- FORMULARIO (AHORA SIN NOTAS - MÁS LIMPIO Y OCUPA TODO EL ESPACIO) -->
+                    <div class="lg:col-span-9">
+                        <div class="bg-white dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-8">
+                            <div class="mb-8">
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Información del Activo</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-1">Actualiza los datos del equipo</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2">ID</label>
+                                    <input type="text" readonly value="{{ $activo->id }}" class="w-full h-12 px-4 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-lg font-medium">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2">Sucursal/Área *</label>
+                                    <input name="sucursal_area" value="{{ old('sucursal_area', $activo->sucursal_area) }}" required 
+                                           class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2">Razón Social *</label>
+                                    <input name="razon_social" value="{{ old('razon_social', $activo->razon_social) }}" required 
+                                           class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
+                                </div>
+
+                                <div class="md:col-span-2 xl:col-span-3">
+                                    <label class="block text-sm font-semibold mb-2">Código de Barras *</label>
+                                    <input name="codigo_barras" value="{{ old('codigo_barras', $activo->codigo_barras) }}" required 
+                                           class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-mono text-lg focus:ring-2 focus:ring-primary/50">
+                                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
+                                </div>
+
+                                <div><label class="block text-sm font-semibold mb-2">Marca *</label><input name="marca" value="{{ old('marca', $activo->marca) }}" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
+                                <div><label class="block text-sm font-semibold mb-2">Modelo *</label><input name="modelo" value="{{ old('modelo', $activo->modelo) }}" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
+                                <div><label class="block text-sm font-semibold mb-2">SD *</label><input name="sd" value="{{ old('sd', $activo->sd) }}" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
+                                <div><label class="block text-sm font-semibold mb-2">RAM *</label><input name="ram" value="{{ old('ram', $activo->ram) }}" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
+                                <div class="xl:col-span-2"><label class="block text-sm font-semibold mb-2">Procesador *</label><input name="procesador" value="{{ old('procesador', $activo->procesador) }}" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50"><p class="text-red-500 text-xs mt-1 hidden error-text"></p></div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2">Asignado a</label>
+                                    <input name="asignado" value="{{ old('asignado', $activo->asignado_a ?? '') }}" 
+                                           class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                                    <p class="text-red-500 text-xs mt-1 hidden error-text"></p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2">Estado *</label>
+                                    <select name="estado" required class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                                        <option value="Activo" {{ $activo->estado == 'Activo' ? 'selected' : '' }}>Activo</option>
+                                        <option value="En Reparación" {{ $activo->estado == 'En Reparación' ? 'selected' : '' }}>En Reparación</option>
+                                        <option value="Obsoleto" {{ $activo->estado == 'Obsoleto' ? 'selected' : '' }}>Obsoleto</option>
+                                        <option value="En Almacén" {{ $activo->estado == 'En Almacén' ? 'selected' : '' }}>En Almacén</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES LATERALES FIJOS -->
+                    <div class="lg:col-span-3">
+                        <div class="sticky top-24 bg-white dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-8 space-y-6">
+                            <div class="text-center">
+                                <h3 class="text-xl font-bold mb-2">Acciones</h3>
+                            </div>
+
+                            <div class="space-y-4">
+                                <a href="{{ route('activos.index') }}" 
+                                   class="w-full block text-center py-4 px-6 border-2 border-gray-300 dark:border-gray-700 rounded-2xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                    Cancelar
+                                </a>
+                                <button type="submit" id="btnGuardar" 
+                                        class="w-full py-4 px-6 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 transition shadow-xl flex items-center justify-center gap-3">
+                                    <span class="material-symbols-outlined text-2xl">save</span>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
     </div>
-</form>
 </div>
 
 <!-- TOAST -->
-<div id="toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl hidden flex items-center gap-3 z-50">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span>¡Cambios guardados!</span>
+<div id="toast" class="fixed bottom-8 right-8 bg-green-600 text-white px-8 py-5 rounded-2xl shadow-2xl hidden flex items-center gap-4 z-50 text-lg font-semibold">
+    <span class="material-symbols-outlined text-3xl">check_circle</span>
+    <span>¡Activo actualizado correctamente!</span>
 </div>
+
 <script>
-document.getElementById('editForm').onsubmit = function(e) {
-    e.preventDefault();
-    
-    const btn = document.getElementById('btnGuardar');
-    const original = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined text-lg animate-spin">sync</span> Guardando...';
+    // AJAX Form
+    document.getElementById('editForm').onsubmit = function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnGuardar');
+        const original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-2xl">sync</span> Guardando...';
 
-    // Limpiar errores
-    document.querySelectorAll('.error-text').forEach(el => {
-        el.classList.add('hidden');
-        el.textContent = '';
-    });
+        document.querySelectorAll('.error-text').forEach(el => {
+            el.classList.add('hidden'); el.textContent = '';
+        });
 
-    fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(r => {
-        if (!r.ok) {
-            return r.json().then(err => { throw err; });
-        }
-        return r.json();
-    })
-    .then(data => {
-        alert('¡Activo actualizado correctamente!');
-        window.location.href = "{{ route('activos.index') }}";
-    })
-    .catch(err => {
-        if (err.errors) {
-            Object.keys(err.errors).forEach(key => {
-                const input = document.querySelector(`[name="${key}"]`);
-                if (input) {
-                    const p = input.parentNode.querySelector('.error-text');
-                    if (p) {
-                        p.textContent = err.errors[key][0];
-                        p.classList.remove('hidden');
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(r => r.ok ? r.json() : r.json().then(err => {throw err}))
+        .then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+            setTimeout(() => location.href = "{{ route('activos.index') }}", 1000);
+        })
+        .catch(err => {
+            if (err.errors) {
+                Object.keys(err.errors).forEach(k => {
+                    const input = document.querySelector(`[name="${k}"]`);
+                    if (input) {
+                        const p = input.parentNode.querySelector('.error-text');
+                        if (p) { p.textContent = err.errors[k][0]; p.classList.remove('hidden'); }
                     }
-                }
-            });
-        }
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = original;
+                });
+            }
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        });
+    };
+
+    // Sidebar móvil
+    document.getElementById('openSidebar')?.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
+        document.getElementById('overlay').classList.remove('hidden');
     });
-};
+    document.getElementById('closeSidebar')?.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+        document.getElementById('overlay').classList.add('hidden');
+    });
+    document.getElementById('overlay')?.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+        document.getElementById('overlay').classList.add('hidden');
+    });
 </script>
 </body>
 </html>
