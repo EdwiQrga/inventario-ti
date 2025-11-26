@@ -2,24 +2,56 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Activo extends Model
-{ 
-// app/Models/Activo.php
-protected $fillable = [
-    'sucursal_area', 'razon_social', 'codigo_barras', 'marca', 'modelo',
-    'sd', 'ram', 'procesador', 'asignado', 'estado'
-];
-    // ¡¡LARAVEL 12: Usa 'date' sin formato si es Y-m-d!!
-    protected $casts = [
-        'fecha_compra' => 'date',           // ← 2023-01-15 → Carbon
-        'fecha_vencimiento' => 'date',      // ← 2025-12-31 → Carbon
-        'costo' => 'decimal:2',
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'sucursal_area',
+        'razon_social', 
+        'codigo_barras',
+        'marca',
+        'modelo',
+        'sd',
+        'ram',
+        'procesador',
+        'asignado',
+        'estado',
+        'asignado_a',
+        'fecha_compra',
+        'sucursal',
+        'tipo',
+        // Nuevos campos para reportes y alertas
+        'fecha_adquisicion',
+        'fecha_vencimiento_garantia',
+        'proveedor_garantia',
+        'ultimo_mantenimiento',
+        'proximo_mantenimiento',
+        'frecuencia_mantenimiento_meses',
+        'estado_operativo',
+        'fecha_fin_vida_util',
+        'vida_util_anos',
+        'observaciones'
     ];
 
-    public function user()
+    protected $casts = [
+        'fecha_adquisicion' => 'date',
+        'fecha_vencimiento_garantia' => 'date',
+        'ultimo_mantenimiento' => 'date',
+        'proximo_mantenimiento' => 'date',
+        'fecha_fin_vida_util' => 'date',
+        'fecha_compra' => 'date',
+    ];
+
+    /**
+     * Relación con las alertas
+     */
+    public function alertas(): HasMany
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->hasMany(Alerta::class);
     }
 }

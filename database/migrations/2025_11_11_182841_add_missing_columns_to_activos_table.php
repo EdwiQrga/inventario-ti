@@ -6,43 +6,38 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('activos', function (Blueprint $table) {
-            // Solo agregar si NO existe
-            if (!Schema::hasColumn('activos', 'sucursal_area')) {
-                $table->string('sucursal_area')->after('sucursal');
-            }
-            if (!Schema::hasColumn('activos', 'razon_social')) {
-                $table->string('razon_social')->after('sucursal_area');
-            }
-            if (!Schema::hasColumn('activos', 'codigo_barras')) {
-                $table->string('codigo_barras')->unique()->after('razon_social');
-            }
-            if (!Schema::hasColumn('activos', 'ssd')) {
-                $table->string('ssd')->nullable()->after('serial');
-            }
-            if (!Schema::hasColumn('activos', 'ram')) {
-                $table->string('ram')->nullable()->after('ssd');
-            }
-            if (!Schema::hasColumn('activos', 'procesador')) {
-                $table->string('procesador')->nullable()->after('ram');
-            }
-            if (!Schema::hasColumn('activos', 'asignado_a')) {
-                $table->string('asignado_a')->nullable()->after('user_id');
-            }
+            // Columnas para alertas (agregar después de la última columna existente)
+            $table->date('fecha_adquisicion')->nullable()->after('Estado');
+            $table->date('fecha_vencimiento_garantia')->nullable()->after('fecha_adquisicion');
+            $table->string('proveedor_garantia')->nullable()->after('fecha_vencimiento_garantia');
+            $table->date('ultimo_mantenimiento')->nullable()->after('proveedor_garantia');
+            $table->date('proximo_mantenimiento')->nullable()->after('ultimo_mantenimiento');
+            $table->integer('frecuencia_mantenimiento_meses')->default(6)->after('proximo_mantenimiento');
+            $table->enum('estado_operativo', ['optimo', 'degradado', 'critico'])->default('optimo')->after('frecuencia_mantenimiento_meses');
+            $table->date('fecha_fin_vida_util')->nullable()->after('estado_operativo');
+            $table->integer('vida_util_anos')->default(5)->after('fecha_fin_vida_util');
+            $table->text('observaciones')->nullable()->after('vida_util_anos');
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('activos', function (Blueprint $table) {
-            $columns = ['sucursal_area', 'razon_social', 'codigo_barras', 'ssd', 'ram', 'procesador', 'asignado_a'];
-            foreach ($columns as $column) {
-                if (Schema::hasColumn('activos', $column)) {
-                    $table->dropColumn($column);
-                }
-            }
+            $table->dropColumn([
+                'fecha_adquisicion',
+                'fecha_vencimiento_garantia',
+                'proveedor_garantia',
+                'ultimo_mantenimiento',
+                'proximo_mantenimiento',
+                'frecuencia_mantenimiento_meses',
+                'estado_operativo',
+                'fecha_fin_vida_util',
+                'vida_util_anos',
+                'observaciones'
+            ]);
         });
     }
 };

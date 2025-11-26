@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activo;
+use App\Models\Impresora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,27 +13,90 @@ class DashboardController extends Controller
     {
         // === RECIBIR FILTROS ===
         $sucursal = $request->get('sucursal');
-        $tipo = $request->get('tipo');
+        $tipo = $request->get('tipo'); // 'computadoras', 'impresoras', o vacío para todos
         $rango = $request->get('rango', 30);
 
-        // === QUERY BASE ===
-        $query = Activo::query();
+        // === INICIALIZAR VARIABLES ===
+        $totalActivos = 0;
+        $sinAsignar = 0;
+        $totalImpresoras = 0;
+        $impresorasActivas = 0;
+        $impresorasMantenimiento = 0;
+        $activosPorSucursal = collect();
+        $impresorasPorMarca = collect();
+        $estadosCount = [];
+        $estadosImpresoras = [];
 
-        // Filtro por sucursal
-        if ($sucursal && $sucursal !== '') {
-            $query->where('sucursal_area', 'like', "%{$sucursal}%");
+        // === FILTRAR POR TIPO ===
+        if ($tipo === 'computadoras' || empty($tipo)) {
+            // === QUERY BASE PARA ACTIVOS (COMPUTADORAS) ===
+            $queryActivos = Activo::query();
+
+            // Filtro por sucursal para activos
+            if ($sucursal && $sucursal !== '') {
+                $queryActivos->where('sucursal_area', 'like', "%{$sucursal}%");
+            }
+
+            // === DATOS DE ACTIVOS ===
+            $totalActivos = $queryActivos->count();
+            $sinAsignar = Activo::when($sucursal, function($query) use ($sucursal) {
+                $query->where('sucursal_area', 'like', "%{$sucursal}%");
+            })->whereNull('asignado')->count();
+
+            // Activos por sucursal
+            $activosPorSucursal = Activo::selectRaw('
+                SUBSTRING_INDEX(sucursal_area, "/", 1) as sucursal,
+                COUNT(*) as count
+            ')
+            ->when($sucursal, function($query) use ($sucursal) {
+                $query->where('sucursal_area', 'like', "%{$sucursal}%");
+            })
+            ->groupBy(DB::raw('SUBSTRING_INDEX(sucursal_area, "/", 1)'))
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+            // Conteo por estado de activos
+            $estadosCount = [
+                'Activo' => Activo::when($sucursal, function($query) use ($sucursal) {
+                    $query->where('sucursal_area', 'like', "%{$sucursal}%");
+                })->where('estado', 'Activo')->count(),
+                'En Reparación' => Activo::when($sucursal, function($query) use ($sucursal) {
+                    $query->where('sucursal_area', 'like', "%{$sucursal}%");
+                })->where('estado', 'En Reparación')->count(),
+                'Obsoleto' => Activo::when($sucursal, function($query) use ($sucursal) {
+                    $query->where('sucursal_area', 'like', "%{$sucursal}%");
+                })->where('estado', 'Obsoleto')->count(),
+            ];
         }
 
-        // Filtro por tipo
-        if ($tipo === 'asignado') {
-            $query->whereNotNull('asignado');
-        } elseif ($tipo === 'sin_asignar') {
-            $query->whereNull('asignado');
-        }
+        if ($tipo === 'impresoras' || empty($tipo)) {
+            // === QUERY BASE PARA IMPRESORAS ===
+            $queryImpresoras = Impresora::query();
 
-        // === DATOS PARA LA VISTA ===
-        $totalActivos = $query->count();
-        $sinAsignar = Activo::whereNull('asignado')->count();
+            // Filtro por sucursal para impresoras (si tu modelo Impresora tiene sucursal)
+            // if ($sucursal && $sucursal !== '' && method_exists(Impresora::class, 'scopeWhereSucursal')) {
+            //     $queryImpresoras->whereSucursal($sucursal);
+            // }
+
+            // === DATOS DE IMPRESORAS ===
+            $totalImpresoras = $queryImpresoras->count();
+            $impresorasActivas = Impresora::where('estado', 'Activa')->count();
+            $impresorasMantenimiento = Impresora::where('estado', 'En Mantenimiento')->count();
+
+            // Impresoras por marca
+            $impresorasPorMarca = Impresora::selectRaw('marca, COUNT(*) as count')
+                ->groupBy('marca')
+                ->orderByDesc('count')
+                ->get();
+
+            // Estados de impresoras
+            $estadosImpresoras = [
+                'Activas' => $impresorasActivas,
+                'En Mantenimiento' => $impresorasMantenimiento,
+                'Inactivas' => $totalImpresoras - $impresorasActivas - $impresorasMantenimiento,
+            ];
+        }
 
         // Vencimientos simulados (puedes cambiar por fecha real después)
         $vencimientosProximos = match((int)$rango) {
@@ -49,31 +113,19 @@ class DashboardController extends Controller
             ->pluck('sucursal_area')
             ->toArray();
 
-        // Tipos para el select
-        $tiposList = ['asignado', 'sin_asignar'];
+        // Tipos para el select - ACTUALIZADO
+        $tiposList = [
+            '' => 'Todos',
+            'computadoras' => 'Computadoras',
+            'impresoras' => 'Impresoras'
+        ];
 
-        // Activos por sucursal (top 10) - COMPATIBLE CON ONLY_FULL_GROUP_BY
-$activosPorSucursal = Activo::selectRaw('
-        SUBSTRING_INDEX(sucursal_area, "/", 1) as sucursal,
-        COUNT(*) as count
-    ')
-    ->groupBy(DB::raw('SUBSTRING_INDEX(sucursal_area, "/", 1)'))
-    ->orderByDesc('count')
-    ->limit(10)
-    ->get();
         // Vencimientos por mes (simulado)
         $meses = ['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'];
         $vencimientosPorMes = [];
         foreach ($meses as $mes) {
             $vencimientosPorMes[$mes] = rand(0, 6);
         }
-
-        // Conteo por estado
-        $estadosCount = [
-            'Activo' => Activo::where('estado', 'Activo')->count(),
-            'En Reparación' => Activo::where('estado', 'En Reparación')->count(),
-            'Obsoleto' => Activo::where('estado', 'Obsoleto')->count(),
-        ];
 
         return view('dashboard', compact(
             'totalActivos',
@@ -84,7 +136,13 @@ $activosPorSucursal = Activo::selectRaw('
             'rango',
             'activosPorSucursal',
             'vencimientosPorMes',
-            'estadosCount'
+            'estadosCount',
+            'totalImpresoras',
+            'impresorasActivas',
+            'impresorasMantenimiento',
+            'impresorasPorMarca',
+            'estadosImpresoras',
+            'tipo' // Agregamos el tipo actual para mantener el filtro
         ));
     }
 }

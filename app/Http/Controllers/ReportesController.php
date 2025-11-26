@@ -1,26 +1,20 @@
 <?php
-// =============================================================================
-// ARCHIVO: app/Http/Controllers/ReportesController.php
-// CREA ESTE ARCHIVO EN LA RUTA EXACTA
-// =============================================================================
 
 namespace App\Http\Controllers;
 
-use App\Exports\InventarioGeneralExport;
-use App\Exports\ActivosPorUsuarioExport;
-use App\Exports\GarantiasVencidasExport;
-use App\Exports\HistorialMantenimientoExport;
-use App\Models\Activo;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Activo;
+use App\Models\Alerta;
+use App\Models\User;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReporteActivosExport;
+use PDF;
 
-class ReportesController extends Controller
+class ReporteController extends Controller
 {
     /**
-     * Muestra la vista de reportes
+     * 📊 Página principal de reportes
      */
     public function index()
     {
@@ -28,130 +22,269 @@ class ReportesController extends Controller
     }
 
     /**
-     * Exporta el reporte seleccionado
+     * 📤 Exportar reportes
      */
-    public function export(Request $request)
+    public function exportar(Request $request)
     {
-        // Obtener parámetros del request
-        $tipoReporte = $request->input('reporte', 'activos_usuario');
-        $formato = $request->input('formato', 'xlsx');
-        $usuarioId = $request->input('usuario');
-        $fechaRango = $request->input('fecha_rango');
+        $request->validate([
+            'reporte' => 'required|string',
+            'formato' => 'required|in:xlsx,csv,pdf',
+            'usuario' => 'nullable|exists:users,id',
+            'fecha_rango' => 'nullable|string',
+        ]);
+
+        $reporte = $request->reporte;
+        $formato = $request->formato;
+        $usuarioId = $request->usuario;
+        $fechaRango = $request->fecha_rango;
 
         // Procesar rango de fechas
-        $fechaInicio = null;
-        $fechaFin = null;
-        
-        if ($fechaRango) {
-            $fechas = explode(' to ', $fechaRango);
-            $fechaInicio = $fechas[0] ?? null;
-            $fechaFin = $fechas[1] ?? $fechas[0] ?? null;
-        }
+        $fechas = $this->procesarRangoFechas($fechaRango);
 
-        // Generar nombre de archivo con timestamp
-        $timestamp = now()->format('Y-m-d_His');
-        $nombreArchivo = "reporte_{$tipoReporte}_{$timestamp}";
-
-        // Ejecutar exportación según tipo de reporte
         try {
-            switch ($tipoReporte) {
+            switch ($reporte) {
                 case 'inventario_general':
-                    return $this->exportarInventarioGeneral($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin);
-                
+                    $data = $this->generarReporteInventarioGeneral();
+                    $nombreArchivo = 'inventario_general_' . date('Y-m-d');
+                    break;
+
                 case 'activos_usuario':
-                    return $this->exportarActivosPorUsuario($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin);
-                
+                    $data = $this->generarReporteActivosUsuario($usuarioId);
+                    $nombreArchivo = 'activos_por_usuario_' . date('Y-m-d');
+                    break;
+
                 case 'garantias_vencidas':
-                    return $this->exportarGarantiasVencidas($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin);
-                
+                    $data = $this->generarReporteGarantiasVencidas($fechas);
+                    $nombreArchivo = 'garantias_vencidas_' . date('Y-m-d');
+                    break;
+
                 case 'mantenimiento':
-                    return $this->exportarHistorialMantenimiento($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin);
-                
+                    $data = $this->generarReporteMantenimiento($fechas);
+                    $nombreArchivo = 'historial_mantenimiento_' . date('Y-m-d');
+                    break;
+
                 default:
-                    return redirect()->back()->with('error', 'Tipo de reporte no válido');
+                    return back()->with('error', 'Tipo de reporte no válido');
             }
+
+            // Exportar según formato
+            if ($formato === 'pdf') {
+                return $this->exportarPDF($data, $nombreArchivo, $reporte);
+            } else {
+                return Excel::download(new ReporteActivosExport($data, $this->getColumnasReporte($reporte)), $nombreArchivo . '.' . $formato);
+            }
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al generar reporte: ' . $e->getMessage());
+            return back()->with('error', 'Error al generar el reporte: ' . $e->getMessage());
         }
     }
 
     /**
-     * Exporta inventario general
+     * 📋 Reporte: Inventario General
      */
-    private function exportarInventarioGeneral($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin)
+    private function generarReporteInventarioGeneral()
     {
-        $export = new InventarioGeneralExport($usuarioId, $fechaInicio, $fechaFin);
-
-        if ($formato === 'pdf') {
-            $data = $export->collection();
-            $pdf = PDF::loadView('reportes.pdf.inventario_general', compact('data'));
-            return $pdf->download("{$nombreArchivo}.pdf");
-        }
-
-        if ($formato === 'csv') {
-            return Excel::download($export, "{$nombreArchivo}.csv", \Maatwebsite\Excel\Excel::CSV);
-        }
-
-        return Excel::download($export, "{$nombreArchivo}.xlsx");
+        return Activo::with('alertas')
+            ->orderBy('sucursal_area')
+            ->orderBy('marca')
+            ->get()
+            ->map(function ($activo) {
+                return [
+                    'Código Barras' => $activo->codigo_barras,
+                    'Marca' => $activo->marca,
+                    'Modelo' => $activo->modelo,
+                    'Sucursal/Área' => $activo->sucursal_area,
+                    'Asignado a' => $activo->asignado,
+                    'Estado' => $activo->estado,
+                    'Estado Operativo' => $activo->estado_operativo,
+                    'Proveedor Garantía' => $activo->proveedor_garantia,
+                    'Vida Útil (años)' => $activo->vida_util_anos,
+                    'Alertas Activas' => $activo->alertas->where('estado', 'pendiente')->count(),
+                    'Fecha Adquisición' => $activo->fecha_adquisicion?->format('d/m/Y'),
+                    'Fin Vida Útil' => $activo->fecha_fin_vida_util?->format('d/m/Y'),
+                ];
+            });
     }
 
     /**
-     * Exporta activos por usuario
+     * 👤 Reporte: Activos por Usuario
      */
-    private function exportarActivosPorUsuario($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin)
+    private function generarReporteActivosUsuario($usuarioId = null)
     {
-        $export = new ActivosPorUsuarioExport($usuarioId, $fechaInicio, $fechaFin);
+        $query = Activo::whereNotNull('asignado')
+            ->where('asignado', '!=', '')
+            ->orderBy('asignado')
+            ->orderBy('marca');
 
-        if ($formato === 'pdf') {
-            $data = $export->getData();
-            $pdf = PDF::loadView('reportes.pdf.activos_usuario', compact('data'));
-            return $pdf->download("{$nombreArchivo}.pdf");
+        if ($usuarioId) {
+            $usuario = User::find($usuarioId);
+            $query->where('asignado', 'LIKE', "%{$usuario->name}%");
         }
 
-        if ($formato === 'csv') {
-            return Excel::download($export, "{$nombreArchivo}.csv", \Maatwebsite\Excel\Excel::CSV);
-        }
-
-        return Excel::download($export, "{$nombreArchivo}.xlsx");
+        return $query->get()
+            ->map(function ($activo) {
+                return [
+                    'Usuario' => $activo->asignado,
+                    'Código Barras' => $activo->codigo_barras,
+                    'Marca' => $activo->marca,
+                    'Modelo' => $activo->modelo,
+                    'Sucursal/Área' => $activo->sucursal_area,
+                    'Estado' => $activo->estado,
+                    'Estado Operativo' => $activo->estado_operativo,
+                    'RAM' => $activo->ram,
+                    'Procesador' => $activo->procesador,
+                    'Almacenamiento' => $activo->sd,
+                    'Fecha Asignación' => $activo->updated_at->format('d/m/Y'),
+                ];
+            });
     }
 
     /**
-     * Exporta garantías vencidas
+     * ⚠️ Reporte: Garantías Vencidas
      */
-    private function exportarGarantiasVencidas($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin)
+    private function generarReporteGarantiasVencidas($fechas = null)
     {
-        $export = new GarantiasVencidasExport($usuarioId, $fechaInicio, $fechaFin);
+        $query = Activo::whereNotNull('fecha_vencimiento_garantia')
+            ->whereNotNull('proveedor_garantia')
+            ->orderBy('fecha_vencimiento_garantia');
 
-        if ($formato === 'pdf') {
-            $data = $export->collection();
-            $pdf = PDF::loadView('reportes.pdf.garantias_vencidas', compact('data'));
-            return $pdf->download("{$nombreArchivo}.pdf");
+        if ($fechas) {
+            $query->whereBetween('fecha_vencimiento_garantia', [$fechas['inicio'], $fechas['fin']]);
+        } else {
+            // Por defecto, mostrar garantías que vencen en los próximos 60 días
+            $query->where('fecha_vencimiento_garantia', '>=', now())
+                  ->where('fecha_vencimiento_garantia', '<=', now()->addDays(60));
         }
 
-        if ($formato === 'csv') {
-            return Excel::download($export, "{$nombreArchivo}.csv", \Maatwebsite\Excel\Excel::CSV);
-        }
-
-        return Excel::download($export, "{$nombreArchivo}.xlsx");
+        return $query->get()
+            ->map(function ($activo) {
+                $diasRestantes = now()->diffInDays(Carbon::parse($activo->fecha_vencimiento_garantia), false);
+                
+                return [
+                    'Código Barras' => $activo->codigo_barras,
+                    'Marca' => $activo->marca,
+                    'Modelo' => $activo->modelo,
+                    'Proveedor Garantía' => $activo->proveedor_garantia,
+                    'Vencimiento Garantía' => $activo->fecha_vencimiento_garantia?->format('d/m/Y'),
+                    'Días Restantes' => $diasRestantes > 0 ? $diasRestantes : 'VENCIDA',
+                    'Estado' => $activo->estado,
+                    'Sucursal/Área' => $activo->sucursal_area,
+                    'Asignado a' => $activo->asignado,
+                ];
+            });
     }
 
     /**
-     * Exporta historial de mantenimiento
+     * 🔧 Reporte: Historial de Mantenimiento
      */
-    private function exportarHistorialMantenimiento($formato, $nombreArchivo, $usuarioId, $fechaInicio, $fechaFin)
+    private function generarReporteMantenimiento($fechas = null)
     {
-        $export = new HistorialMantenimientoExport($usuarioId, $fechaInicio, $fechaFin);
+        $query = Activo::where(function($q) {
+                $q->whereNotNull('ultimo_mantenimiento')
+                 ->orWhereNotNull('proximo_mantenimiento');
+            })
+            ->orderBy('proximo_mantenimiento', 'ASC')
+            ->orderBy('sucursal_area');
 
-        if ($formato === 'pdf') {
-            $data = $export->collection();
-            $pdf = PDF::loadView('reportes.pdf.mantenimiento', compact('data'));
-            return $pdf->download("{$nombreArchivo}.pdf");
+        if ($fechas) {
+            $query->where(function($q) use ($fechas) {
+                $q->whereBetween('ultimo_mantenimiento', [$fechas['inicio'], $fechas['fin']])
+                  ->orWhereBetween('proximo_mantenimiento', [$fechas['inicio'], $fechas['fin']]);
+            });
         }
 
-        if ($formato === 'csv') {
-            return Excel::download($export, "{$nombreArchivo}.csv", \Maatwebsite\Excel\Excel::CSV);
-        }
+        return $query->get()
+            ->map(function ($activo) {
+                $diasProximo = $activo->proximo_mantenimiento ? 
+                    now()->diffInDays(Carbon::parse($activo->proximo_mantenimiento), false) : null;
 
-        return Excel::download($export, "{$nombreArchivo}.xlsx");
+                return [
+                    'Código Barras' => $activo->codigo_barras,
+                    'Marca' => $activo->marca,
+                    'Modelo' => $activo->modelo,
+                    'Sucursal/Área' => $activo->sucursal_area,
+                    'Último Mantenimiento' => $activo->ultimo_mantenimiento?->format('d/m/Y'),
+                    'Próximo Mantenimiento' => $activo->proximo_mantenimiento?->format('d/m/Y'),
+                    'Días para Próximo' => $diasProximo,
+                    'Frecuencia (meses)' => $activo->frecuencia_mantenimiento_meses,
+                    'Estado Operativo' => $activo->estado_operativo,
+                    'Asignado a' => $activo->asignado,
+                ];
+            });
+    }
+
+    /**
+     * 📅 Procesar rango de fechas
+     */
+    private function procesarRangoFechas($fechaRango)
+    {
+        if (!$fechaRango) return null;
+
+        $fechas = explode(' to ', $fechaRango);
+        
+        return [
+            'inicio' => Carbon::parse($fechas[0])->startOfDay(),
+            'fin' => isset($fechas[1]) ? Carbon::parse($fechas[1])->endOfDay() : Carbon::parse($fechas[0])->endOfDay()
+        ];
+    }
+
+    /**
+     * 📑 Obtener columnas según tipo de reporte
+     */
+    private function getColumnasReporte($reporte)
+    {
+        $columnas = [
+            'inventario_general' => [
+                'Código Barras', 'Marca', 'Modelo', 'Sucursal/Área', 'Asignado a', 
+                'Estado', 'Estado Operativo', 'Proveedor Garantía', 'Vida Útil (años)',
+                'Alertas Activas', 'Fecha Adquisición', 'Fin Vida Útil'
+            ],
+            'activos_usuario' => [
+                'Usuario', 'Código Barras', 'Marca', 'Modelo', 'Sucursal/Área',
+                'Estado', 'Estado Operativo', 'RAM', 'Procesador', 'Almacenamiento',
+                'Fecha Asignación'
+            ],
+            'garantias_vencidas' => [
+                'Código Barras', 'Marca', 'Modelo', 'Proveedor Garantía', 
+                'Vencimiento Garantía', 'Días Restantes', 'Estado', 'Sucursal/Área', 'Asignado a'
+            ],
+            'mantenimiento' => [
+                'Código Barras', 'Marca', 'Modelo', 'Sucursal/Área', 
+                'Último Mantenimiento', 'Próximo Mantenimiento', 'Días para Próximo',
+                'Frecuencia (meses)', 'Estado Operativo', 'Asignado a'
+            ],
+        ];
+
+        return $columnas[$reporte] ?? [];
+    }
+
+    /**
+     * 📄 Exportar a PDF
+     */
+    private function exportarPDF($data, $nombreArchivo, $tipoReporte)
+    {
+        $pdf = PDF::loadView('reportes.pdf', [
+            'data' => $data,
+            'titulo' => $this->getTituloReporte($tipoReporte),
+            'columnas' => $this->getColumnasReporte($tipoReporte),
+            'fechaGeneracion' => now()->format('d/m/Y H:i:s')
+        ]);
+
+        return $pdf->download($nombreArchivo . '.pdf');
+    }
+
+    /**
+     * 🏷️ Obtener título del reporte
+     */
+    private function getTituloReporte($reporte)
+    {
+        $titulos = [
+            'inventario_general' => 'Inventario General de Activos',
+            'activos_usuario' => 'Activos por Usuario',
+            'garantias_vencidas' => 'Reporte de Garantías Vencidas/Próximas a Vencer',
+            'mantenimiento' => 'Historial de Mantenimiento de Activos',
+        ];
+
+        return $titulos[$reporte] ?? 'Reporte de Activos';
     }
 }

@@ -2,48 +2,101 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Licencia;
-use App\Models\Mantenimiento;
 use App\Models\Alerta;
+use App\Models\Activo;
 use Illuminate\Http\Request;
 
 class AlertaController extends Controller
 {
     public function index(Request $request)
     {
-        // === LICENCIAS POR VENCER (próximos 60 días) ===
-        $licenciasPorVencer = Licencia::whereNotNull('fecha_vencimiento')
-            ->whereBetween('fecha_vencimiento', [now(), now()->addDays(60)])
-            ->with('activo') // Relación con el modelo Activo
-            ->orderBy('fecha_vencimiento')
-            ->get();
+        $search = $request->get('search');
+        
+        $alertas = Alerta::with('activo')
+            ->when($search, function($query, $search) {
+                return $query->where('titulo', 'like', "%{$search}%")
+                           ->orWhere('descripcion', 'like', "%{$search}%")
+                           ->orWhere('prioridad', 'like', "%{$search}%")
+                           ->orWhere('tipo', 'like', "%{$search}%")
+                           ->orWhereHas('activo', function($q) use ($search) {
+                               $q->where('nombre', 'like', "%{$search}%");
+                           });
+            })
+            ->orderByRaw("FIELD(prioridad, 'Crítica', 'Moderada', 'Información')")
+            ->orderBy('fecha_vencimiento', 'asc')
+            ->paginate(10);
 
-        // === MANTENIMIENTOS PRÓXIMOS (en los siguientes 30 días) ===
-        $mantenimientosProximos = Mantenimiento::whereNotNull('proxima_fecha')
-            ->whereBetween('proxima_fecha', [now(), now()->addDays(30)])
-            ->with('activo') // Relación con el modelo Activo
-            ->orderBy('proxima_fecha')
-            ->get();
+        return view('alertas.index', compact('alertas'));
+    }
 
-        // === ALERTAS (con búsqueda por descripción, prioridad o activo relacionado) ===
-        $query = Alerta::with('activo');
+    public function create()
+    {
+        $activos = Activo::all();
+        return view('alertas.create', compact('activos'));
+    }
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
+    public function store(Request $request)
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:500',
+            'activo_id' => 'nullable|exists:activos,id',
+            'tipo' => 'required|string|max:100',
+            'fecha_alerta' => 'required|date',
+            'fecha_vencimiento' => 'required|date|after_or_equal:fecha_alerta',
+            'prioridad' => 'required|in:Crítica,Moderada,Información',
+        ]);
 
-            $query->where(function ($q) use ($search) {
-                $q->where('descripcion', 'like', "%{$search}%")
-                  ->orWhere('prioridad', 'like', "%{$search}%")
-                  ->orWhereHas('activo', function ($q) use ($search) {
-                      $q->where('nombre', 'like', "%{$search}%");
-                  });
-            });
-        }
+        Alerta::create([
+            'titulo' => $request->titulo,
+            'descripcion' => $request->descripcion,
+            'activo_id' => $request->activo_id,
+            'tipo' => $request->tipo,
+            'fecha_alerta' => $request->fecha_alerta,
+            'fecha_vencimiento' => $request->fecha_vencimiento,
+            'prioridad' => $request->prioridad,
+            'estado' => 'Nueva',
+        ]);
 
-        // Paginación de alertas
-        $alertas = $query->orderBy('created_at', 'desc')->paginate(10);
+        return redirect()->route('alertas.index')
+            ->with('success', 'Alerta creada exitosamente.');
+    }
 
-        // === DEVOLVER TODO A LA VISTA ===
-        return view('alertas.index', compact('licenciasPorVencer', 'mantenimientosProximos', 'alertas'));
+    public function show(Alerta $alerta)
+    {
+        return view('alertas.show', compact('alerta'));
+    }
+
+    public function edit(Alerta $alerta)
+    {
+        $activos = Activo::all();
+        return view('alertas.edit', compact('alerta', 'activos'));
+    }
+
+    public function update(Request $request, Alerta $alerta)
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:500',
+            'activo_id' => 'nullable|exists:activos,id',
+            'tipo' => 'required|string|max:100',
+            'fecha_alerta' => 'required|date',
+            'fecha_vencimiento' => 'required|date|after_or_equal:fecha_alerta',
+            'prioridad' => 'required|in:Crítica,Moderada,Información',
+            'estado' => 'required|in:Nueva,En Proceso,Resuelta',
+        ]);
+
+        $alerta->update($request->all());
+
+        return redirect()->route('alertas.index')
+            ->with('success', 'Alerta actualizada exitosamente.');
+    }
+
+    public function destroy(Alerta $alerta)
+    {
+        $alerta->delete();
+
+        return redirect()->route('alertas.index')
+            ->with('success', 'Alerta eliminada exitosamente.');
     }
 }

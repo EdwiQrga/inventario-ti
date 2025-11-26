@@ -63,7 +63,7 @@
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span class="text-sm font-medium">Inventario</span>
             </a>
-            <!-- DASHBOARD RESALTADO (solo se cambió filled → outlined) -->
+            <!-- DASHBOARD RESALTADO -->
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm font-semibold">Dashboard</span>
@@ -143,26 +143,33 @@
                             <option value="{{ $suc }}" {{ request('sucursal') == $suc ? 'selected' : '' }}>{{ $suc }}</option>
                         @endforeach
                     </select>
+                    
+                    <!-- FILTRO POR TIPO ACTUALIZADO -->
                     <select name="tipo" class="h-10 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-                        <option value="">Tipo: Todos</option>
-                        @foreach($tiposList as $tipo)
-                            <option value="{{ $tipo }}" {{ request('tipo') == $tipo ? 'selected' : '' }}>{{ $tipo }}</option>
+                        @foreach($tiposList as $value => $label)
+                            <option value="{{ $value }}" {{ request('tipo') == $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
                         @endforeach
                     </select>
+                    
                     <select name="rango" class="h-10 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
                         <option value="30" {{ $rango == 30 ? 'selected' : '' }}>Últimos 30 días</option>
                         <option value="90" {{ $rango == 90 ? 'selected' : '' }}>Últimos 90 días</option>
                         <option value="365" {{ $rango == 365 ? 'selected' : '' }}>Último año</option>
                     </select>
+                    
                     <button type="submit" class="h-10 px-4 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90">
                         Aplicar
                     </button>
                 </form>
 
-                <!-- Tarjetas de resumen -->
+                <!-- Tarjetas de resumen - CONDICIONALES -->
+                @if(empty($tipo) || $tipo === 'computadoras')
+                <!-- Tarjetas de resumen - ACTIVOS -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Total de Activos</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total de Computadoras</p>
                         <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{ $totalActivos }}</p>
                     </div>
                     <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
@@ -174,12 +181,33 @@
                         <p class="text-3xl font-bold text-red-600 dark:text-red-400 mt-1">{{ $vencimientosProximos }}</p>
                     </div>
                 </div>
+                @endif
+
+                @if(empty($tipo) || $tipo === 'impresoras')
+                <!-- Tarjetas de resumen - IMPRESORAS -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Impresoras</p>
+                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1">{{ $totalImpresoras }}</p>
+                    </div>
+                    <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Impresoras Activas</p>
+                        <p class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">{{ $impresorasActivas }}</p>
+                    </div>
+                    <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">En Mantenimiento</p>
+                        <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">{{ $impresorasMantenimiento }}</p>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Gráficos -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                     <!-- Izquierda: Barras -->
-                    <div class="lg:col-span-8">
+                    <div class="lg:col-span-8 space-y-6">
+                        @if(empty($tipo) || $tipo === 'computadoras')
+                        <!-- Gráfico: Vencimientos de Garantía -->
                         <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
                             <h3 class="text-lg font-semibold mb-4">Vencimientos de Garantía (próximos 6 meses)</h3>
                             <div class="h-56 flex items-end justify-between gap-2 px-2">
@@ -193,14 +221,33 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
+
+                        @if(empty($tipo) || $tipo === 'impresoras')
+                        <!-- Gráfico: Impresoras por Marca -->
+                        <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
+                            <h3 class="text-lg font-semibold mb-4">Impresoras por Marca</h3>
+                            <div class="h-56 flex items-end justify-between gap-2 px-2">
+                                @foreach($impresorasPorMarca as $marca)
+                                    <div class="flex-1 flex flex-col items-center group">
+                                        <div class="w-full bg-accent-2/50 dark:bg-accent-2/30 rounded-t-lg chart-bar transition-all group-hover:bg-accent-2/70" 
+                                             style="height: {{ min($marca->count * 15, 200) }}px;"></div>
+                                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($marca->marca, 8) }}</p>
+                                        <p class="text-xs font-medium text-accent-2">{{ $marca->count }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Derecha: Donut + Barras -->
                     <div class="lg:col-span-4 space-y-6">
 
+                        @if(empty($tipo) || $tipo === 'computadoras')
                         <!-- Donut: Sucursales -->
                         <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
-                            <h3 class="text-lg font-semibold mb-4">Activos por Sucursal</h3>
+                            <h3 class="text-lg font-semibold mb-4">Computadoras por Sucursal</h3>
                             <div class="relative w-36 h-36 mx-auto">
                                 <svg class="w-full h-full" viewBox="0 0 36 36">
                                     @php
@@ -236,9 +283,9 @@
                             </div>
                         </div>
 
-                        <!-- Barras: Estado -->
+                        <!-- Barras: Estado de Computadoras -->
                         <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
-                            <h3 class="text-lg font-semibold mb-4">Estado de Activos</h3>
+                            <h3 class="text-lg font-semibold mb-4">Estado de Computadoras</h3>
                             <div class="space-y-3 text-xs">
                                 @foreach($estadosCount as $estado => $count)
                                     @php
@@ -248,16 +295,38 @@
                                     <div class="flex items-center gap-2">
                                         <span class="w-16 text-gray-500 dark:text-gray-400">{{ $estado }}</span>
                                         <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-    <div 
-        class="{{ $color }} h-full rounded-full transition-all duration-500 ease-out" 
-        style="width: {{ $porcentaje }}%"
-    ></div>
-</div>
+                                            <div class="{{ $color }} h-full rounded-full transition-all duration-500 ease-out" 
+                                                 style="width: {{ $porcentaje }}%"></div>
+                                        </div>
                                         <span class="w-8 text-right font-medium">{{ $count }}</span>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
+                        @endif
+
+                        @if(empty($tipo) || $tipo === 'impresoras')
+                        <!-- Barras: Estado de Impresoras -->
+                        <div class="p-5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-xl shadow-md">
+                            <h3 class="text-lg font-semibold mb-4">Estado de Impresoras</h3>
+                            <div class="space-y-3 text-xs">
+                                @foreach($estadosImpresoras as $estado => $count)
+                                    @php
+                                        $porcentaje = $totalImpresoras > 0 ? ($count / $totalImpresoras) * 100 : 0;
+                                        $color = $estado == 'Activas' ? 'bg-green-500' : ($estado == 'En Mantenimiento' ? 'bg-yellow-500' : 'bg-gray-500');
+                                    @endphp
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-20 text-gray-500 dark:text-gray-400">{{ $estado }}</span>
+                                        <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                                            <div class="{{ $color }} h-full rounded-full transition-all duration-500 ease-out" 
+                                                 style="width: {{ $porcentaje }}%"></div>
+                                        </div>
+                                        <span class="w-8 text-right font-medium">{{ $count }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
