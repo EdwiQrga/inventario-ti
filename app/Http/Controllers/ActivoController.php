@@ -293,24 +293,43 @@ class ActivoController extends Controller
         $alertasGeneradas = [];
 
         try {
+            // Verificar que el activo existe y tiene ID
+            if (!$activo || !$activo->id) {
+                Log::error('No se puede generar alertas: El activo no existe o no tiene ID');
+                return $alertasGeneradas;
+            }
+
+            Log::info("Generando alertas para activo ID: {$activo->id}");
+
             // Alerta de próximo mantenimiento
             if ($activo->proximo_mantenimiento) {
                 $fechaMantenimiento = Carbon::parse($activo->proximo_mantenimiento);
                 $hoy = Carbon::now();
                 
-                if ($fechaMantenimiento->diffInDays($hoy) <= 30) {
-                    $alerta = Alerta::create([
-                        'activo_id' => $activo->id,
-                        'tipo' => 'mantenimiento',
-                        'titulo' => 'Mantenimiento próximo para ' . $activo->marca . ' ' . $activo->modelo,
-                        'descripcion' => 'El mantenimiento programado está próximo para el ' . $activo->proximo_mantenimiento,
-                        'fecha_alerta' => now(),
-                        'fecha_vencimiento' => $activo->proximo_mantenimiento,
-                        'prioridad' => $fechaMantenimiento->diffInDays($hoy) <= 7 ? 'alta' : 'media',
-                        'estado' => 'pendiente'
-                    ]);
-                    $alertasGeneradas[] = $alerta;
-                    Log::info("Alerta de mantenimiento creada para activo ID: {$activo->id}");
+                // Verificar si la fecha es válida y está dentro de los próximos 30 días
+                if ($fechaMantenimiento->isValid() && $fechaMantenimiento->diffInDays($hoy) <= 30) {
+                    
+                    // Verificar si ya existe una alerta similar para evitar duplicados
+                    $alertaExistente = Alerta::where('activo_id', $activo->id)
+                        ->where('tipo', 'mantenimiento')
+                        ->where('fecha_vencimiento', $activo->proximo_mantenimiento)
+                        ->where('estado', '!=', 'resuelta')
+                        ->first();
+                    
+                    if (!$alertaExistente) {
+                        $alerta = Alerta::create([
+                            'activo_id' => $activo->id,
+                            'tipo' => 'mantenimiento',
+                            'titulo' => 'Mantenimiento próximo para ' . $activo->marca . ' ' . $activo->modelo,
+                            'descripcion' => 'El mantenimiento programado está próximo para el ' . $fechaMantenimiento->format('d/m/Y'),
+                            'fecha_alerta' => now(),
+                            'fecha_vencimiento' => $activo->proximo_mantenimiento,
+                            'prioridad' => $fechaMantenimiento->diffInDays($hoy) <= 7 ? 'alta' : 'moderada',
+                            'estado' => 'nueva'
+                        ]);
+                        $alertasGeneradas[] = $alerta;
+                        Log::info("Alerta de mantenimiento creada para activo ID: {$activo->id}");
+                    }
                 }
             }
 
@@ -319,19 +338,31 @@ class ActivoController extends Controller
                 $fechaGarantia = Carbon::parse($activo->fecha_vencimiento_garantia);
                 $hoy = Carbon::now();
                 
-                if ($fechaGarantia->diffInDays($hoy) <= 60) {
-                    $alerta = Alerta::create([
-                        'activo_id' => $activo->id,
-                        'tipo' => 'garantia',
-                        'titulo' => 'Garantía próxima a vencer - ' . $activo->proveedor_garantia,
-                        'descripcion' => 'La garantía con ' . $activo->proveedor_garantia . ' vence el ' . $activo->fecha_vencimiento_garantia,
-                        'fecha_alerta' => now(),
-                        'fecha_vencimiento' => $activo->fecha_vencimiento_garantia,
-                        'prioridad' => $fechaGarantia->diffInDays($hoy) <= 30 ? 'alta' : 'media',
-                        'estado' => 'pendiente'
-                    ]);
-                    $alertasGeneradas[] = $alerta;
-                    Log::info("Alerta de garantía creada para activo ID: {$activo->id}");
+                if ($fechaGarantia->isValid() && $fechaGarantia->diffInDays($hoy) <= 60) {
+                    
+                    // Verificar si ya existe una alerta similar para evitar duplicados
+                    $alertaExistente = Alerta::where('activo_id', $activo->id)
+                        ->where('tipo', 'garantia')
+                        ->where('fecha_vencimiento', $activo->fecha_vencimiento_garantia)
+                        ->where('estado', '!=', 'resuelta')
+                        ->first();
+                    
+                    if (!$alertaExistente) {
+                        $proveedor = $activo->proveedor_garantia ?? 'Proveedor no especificado';
+                        
+                        $alerta = Alerta::create([
+                            'activo_id' => $activo->id,
+                            'tipo' => 'garantia',
+                            'titulo' => 'Garantía próxima a vencer - ' . $proveedor,
+                            'descripcion' => 'La garantía con ' . $proveedor . ' vence el ' . $fechaGarantia->format('d/m/Y'),
+                            'fecha_alerta' => now(),
+                            'fecha_vencimiento' => $activo->fecha_vencimiento_garantia,
+                            'prioridad' => $fechaGarantia->diffInDays($hoy) <= 30 ? 'alta' : 'moderada',
+                            'estado' => 'nueva'
+                        ]);
+                        $alertasGeneradas[] = $alerta;
+                        Log::info("Alerta de garantía creada para activo ID: {$activo->id}");
+                    }
                 }
             }
 
@@ -340,24 +371,37 @@ class ActivoController extends Controller
                 $fechaVidaUtil = Carbon::parse($activo->fecha_fin_vida_util);
                 $hoy = Carbon::now();
                 
-                if ($fechaVidaUtil->diffInDays($hoy) <= 90) {
-                    $alerta = Alerta::create([
-                        'activo_id' => $activo->id,
-                        'tipo' => 'vida_util',
-                        'titulo' => 'Fin de vida útil próximo',
-                        'descripcion' => 'El activo alcanzará el fin de su vida útil el ' . $activo->fecha_fin_vida_util,
-                        'fecha_alerta' => now(),
-                        'fecha_vencimiento' => $activo->fecha_fin_vida_util,
-                        'prioridad' => 'media',
-                        'estado' => 'pendiente'
-                    ]);
-                    $alertasGeneradas[] = $alerta;
-                    Log::info("Alerta de vida útil creada para activo ID: {$activo->id}");
+                if ($fechaVidaUtil->isValid() && $fechaVidaUtil->diffInDays($hoy) <= 90) {
+                    
+                    // Verificar si ya existe una alerta similar para evitar duplicados
+                    $alertaExistente = Alerta::where('activo_id', $activo->id)
+                        ->where('tipo', 'vida_util')
+                        ->where('fecha_vencimiento', $activo->fecha_fin_vida_util)
+                        ->where('estado', '!=', 'resuelta')
+                        ->first();
+                    
+                    if (!$alertaExistente) {
+                        $alerta = Alerta::create([
+                            'activo_id' => $activo->id,
+                            'tipo' => 'vida_util',
+                            'titulo' => 'Fin de vida útil próximo',
+                            'descripcion' => 'El activo alcanzará el fin de su vida útil el ' . $fechaVidaUtil->format('d/m/Y'),
+                            'fecha_alerta' => now(),
+                            'fecha_vencimiento' => $activo->fecha_fin_vida_util,
+                            'prioridad' => 'moderada',
+                            'estado' => 'nueva'
+                        ]);
+                        $alertasGeneradas[] = $alerta;
+                        Log::info("Alerta de vida útil creada para activo ID: {$activo->id}");
+                    }
                 }
             }
 
+            Log::info("Total alertas generadas para activo ID {$activo->id}: " . count($alertasGeneradas));
+
         } catch (\Exception $e) {
-            Log::error('Error al generar alertas para activo ID ' . $activo->id . ': ' . $e->getMessage());
+            Log::error('Error al generar alertas para activo ID ' . ($activo->id ?? 'desconocido') . ': ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
         }
 
         return $alertasGeneradas;

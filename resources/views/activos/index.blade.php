@@ -89,9 +89,9 @@
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span class="text-sm font-semibold">Inventario</span>
             </a>
-            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
-                <span class="material-symbols-outlined">print</span>
-                <span class="text-sm font-semibold">Impresora</span>
+            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-medium">Impresoras</span>
             </a>
             <a href="{{ route('usuarios.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
                 <span class="material-symbols-outlined">group</span>

@@ -47,42 +47,45 @@
 <div class="relative flex h-auto min-h-screen w-full group/design-root overflow-x-hidden">
     <div class="layout-container flex h-full grow flex-row">
 
-        <!-- Sidebar: group outlined + py-3 px-4 -->
-        <aside class="flex-col gap-y-6 items-stretch p-4 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 hidden lg:flex w-64 shadow-sm">
-            <div class="flex items-center gap-x-3 px-4 py-2">
-                <svg class="h-8 w-8 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
-                </svg>
-                <span class="text-xl font-bold text-gray-900 dark:text-white">Inventario TI</span>
+       <!-- Sidebar -->
+   <aside id="sidebar" class="lg:w-64 w-full lg:block fixed lg:static inset-0 z-40 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-sm">
+        <div class="flex items-center justify-between lg:justify-start gap-4 px-6 h-16 border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-2">
+                <img src="{{ asset('images/pmn.png') }}" alt="Logo" class="h-8 w-8 object-contain"/>
+                <span class="text-xl font-bold text-primary hidden sm:block">Inventario TI</span>
+                <span class="text-xl font-bold text-primary sm:hidden">IT</span>
             </div>
-            <nav class="flex flex-col gap-y-1.5 flex-1 px-2">
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('dashboard') }}">
-                    <span class="material-symbols-outlined text-xl">home</span>
-                    <span class="text-sm font-medium">Inicio</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('activos.index') }}">
-                    <span class="material-symbols-outlined text-xl">inventory_2</span>
-                    <span class="text-sm font-medium">Inventario</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="dashboard">
-                    <span class="material-symbols-outlined text-xl">dashboard</span>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('alertas.index') }}">
-                    <span class="material-symbols-outlined text-xl">notifications</span>
-                    <span class="text-sm font-medium">Alertas</span>
-                </a>
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors" href="{{ route('reportes.index') }}">
-                    <span class="material-symbols-outlined text-xl">assessment</span>
-                    <span class="text-sm font-medium">Reportes</span>
-                </a>
-                <!-- ÍTEM ACTIVO: group outlined (NO filled) -->
-                <a class="flex items-center gap-x-3 py-3 px-4 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90 transition-colors" href="{{ route('usuarios.index') }}">
-                    <span class="material-symbols-outlined text-xl">group</span>
-                    <span class="text-sm font-semibold">Gestión de Usuarios</span>
-                </a>
-            </nav>
-        </aside>
+            <button id="closeSidebar" class="lg:hidden">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="{{ route('activos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-medium">Inventario</span>
+            </a>
+            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-medium">Impresoras</span>
+            </a>
+            <a href="{{ route('activos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-sm font-semibold">usuarios</span>
+            </a>
+            <a href="{{ route('reportes.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">assessment</span>
+                <span class="text-sm font-medium">Reportes</span>
+            </a>
+            <a href="{{ route('alertas.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">notifications_active</span>
+                <span class="text-sm font-medium">Alertas</span>
+            </a>
+        </nav>
+    </aside>
 
         <!-- Main Content -->
         <div class="flex flex-col flex-1">

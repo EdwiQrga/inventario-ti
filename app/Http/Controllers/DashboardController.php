@@ -74,11 +74,6 @@ class DashboardController extends Controller
             // === QUERY BASE PARA IMPRESORAS ===
             $queryImpresoras = Impresora::query();
 
-            // Filtro por sucursal para impresoras (si tu modelo Impresora tiene sucursal)
-            // if ($sucursal && $sucursal !== '' && method_exists(Impresora::class, 'scopeWhereSucursal')) {
-            //     $queryImpresoras->whereSucursal($sucursal);
-            // }
-
             // === DATOS DE IMPRESORAS ===
             $totalImpresoras = $queryImpresoras->count();
             $impresorasActivas = Impresora::where('estado', 'Activa')->count();
@@ -127,22 +122,29 @@ class DashboardController extends Controller
             $vencimientosPorMes[$mes] = rand(0, 6);
         }
 
-        return view('dashboard', compact(
-            'totalActivos',
-            'sinAsignar',
-            'vencimientosProximos',
-            'sucursalesList',
-            'tiposList',
-            'rango',
-            'activosPorSucursal',
-            'vencimientosPorMes',
-            'estadosCount',
-            'totalImpresoras',
-            'impresorasActivas',
-            'impresorasMantenimiento',
-            'impresorasPorMarca',
-            'estadosImpresoras',
-            'tipo' // Agregamos el tipo actual para mantener el filtro
-        ));
+        // === RETURN ACTUALIZADO CON HEADERS ANTI-CACHE ===
+        return response()
+            ->view('dashboard', compact(
+                'totalActivos',
+                'sinAsignar',
+                'vencimientosProximos',
+                'sucursalesList',
+                'tiposList',
+                'rango',
+                'activosPorSucursal',
+                'vencimientosPorMes',
+                'estadosCount',
+                'totalImpresoras',
+                'impresorasActivas',
+                'impresorasMantenimiento',
+                'impresorasPorMarca',
+                'estadosImpresoras',
+                'tipo'
+            ))
+            ->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => 'Fri, 01 Jan 1990 00:00:00 GMT',
+            ]);
     }
 }

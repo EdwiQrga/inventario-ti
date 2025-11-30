@@ -32,20 +32,43 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 min-h-screen">
 <div class="flex flex-col lg:flex-row min-h-screen">
 
-    <!-- Sidebar -->
- <aside id="sidebar" class="lg:w-64 w-full lg:block fixed lg:static inset-0 z-40 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-sm">
+  <!-- Sidebar -->
+   <aside id="sidebar" class="lg:w-64 w-full lg:block fixed lg:static inset-0 z-40 bg-white dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-sm">
         <div class="flex items-center justify-between lg:justify-start gap-4 px-6 h-16 border-b border-gray-200 dark:border-gray-800">
             <div class="flex items-center gap-2">
                 <img src="{{ asset('images/pmn.png') }}" alt="Logo" class="h-8 w-8 object-contain"/>
-                <span class="text-xl font-bold text-primary">Inventario TI</span>
+                <span class="text-xl font-bold text-primary hidden sm:block">Inventario TI</span>
+                <span class="text-xl font-bold text-primary sm:hidden">IT</span>
             </div>
-            <button id="closeSidebar" class="lg:hidden"><span class="material-symbols-outlined">close</span></button>
+            <button id="closeSidebar" class="lg:hidden">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
         <nav class="p-4 space-y-2">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>
-            <a href="{{ route('activos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"><span class="material-symbols-outlined">inventory_2</span>Inventario</a>
-            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90"><span class="material-symbols-outlined">print</span>Impresoras</a>
-            <a href="{{ route('usuarios.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"><span class="material-symbols-outlined">group</span>Gestión de Usuarios</a>
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="{{ route('activos.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-medium">Inventario</span>
+            </a>
+            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-semibold">Impresoras</span>
+            </a>
+            <a href="{{ route('usuarios.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-sm font-medium">Usuarios</span>
+            </a>
+            <a href="{{ route('reportes.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">assessment</span>
+                <span class="text-sm font-medium">Reportes</span>
+            </a>
+            <a href="{{ route('alertas.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">notifications_active</span>
+                <span class="text-sm font-medium">Alertas</span>
+            </a>
         </nav>
     </aside>
 

@@ -63,6 +63,11 @@
                 <span class="material-symbols-outlined">inventory_2</span>
                 <span class="text-sm font-medium">Inventario</span>
             </a>
+            <a href="{{ route('impresoras.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="text-sm font-medium">Impresoras</span>
+            </a>
+
             <!-- DASHBOARD RESALTADO -->
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-white bg-primary shadow-sm hover:bg-primary/90">
                 <span class="material-symbols-outlined">dashboard</span>
@@ -89,12 +94,19 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col">
 
-        <!-- Header -->
+        <!-- Header CON FLECHA DE REGRESO -->
         <header class="flex items-center justify-between px-4 lg:px-10 py-3 h-16 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
             <div class="flex items-center gap-4">
                 <button id="openSidebar" class="lg:hidden">
                     <span class="material-symbols-outlined text-2xl">menu</span>
                 </button>
+                
+                <!-- FLECHA DE REGRESO -->
+                <button onclick="window.history.back()" class="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span class="hidden sm:inline text-sm font-medium">Regresar</span>
+                </button>
+                
                 <h1 class="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
@@ -354,6 +366,13 @@
     overlay?.addEventListener('click', () => {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('hidden');
+    });
+
+    // Prevenir cache del navegador
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
     });
 </script>
 </body>

@@ -9,7 +9,7 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpresoraController;
-
+use App\Http\Controllers\AuthController;
 // --------------------------------------------------
 // RUTAS PÚBLICAS
 // --------------------------------------------------
@@ -93,3 +93,52 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::post('/activos/ajax', [ActivoController::class, 'store'])->name('activos.store.ajax');
 });
 Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+// Rutas de autenticación (EXISTENTES - NO MODIFICAR)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// NUEVAS RUTAS - Agregar recuperación de contraseña
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update');
+
+// Ruta del dashboard (EXISTENTE)
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+
+
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+// Rutas públicas (sin autenticación)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'reset'])->name('password.update');
+
+// Rutas protegidas (requieren autenticación)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Agrega aquí todas tus otras rutas protegidas:
+    // Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario');
+    // Route::get('/otra-ruta', [OtroController::class, 'index'])->name('otra.ruta');
+    
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+});
